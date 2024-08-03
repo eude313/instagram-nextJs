@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /* dark:
 background(modal,dropdown)
       #1A1A1A   -current
@@ -20,9 +21,29 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
+.great-vibes-regular {
+  font-family: "Great Vibes", cursive;
+  font-style: normal;
+}
+
+.dark .custom-dropdown-bg {
+  background-color: #262626 !important;
+}
 
 @media (max-height: 700px) {
   .hide-on-small-height {
     display: none !important;
+  }
+
+}
+
+@media (min-height: 700px) {
+  .hide-on-large-height {
+    display: none !important;
+  }
+
+  .spacing {
+    padding-top: 40px;
+    padding-bottom: 30px;
   }
 }

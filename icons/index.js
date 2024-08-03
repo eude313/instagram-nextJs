@@ -24,5 +24,9 @@ import Setting from './Setting';
 import Search from './Search';
 import Threads from './Threads';
 import Menu from './Menu';
+import Insta from './Insta';
+import Instagram from './Instagram';
+import MessageWarning from './MessageWarning';
+import Activity from './Activity';
 
-export {Home,Heart,Tagged,Bookmark,Chat,Explore,Image,Inbox,Message,Posts,Reels,Share,Create,Following,Favorite,Messenger,Phone,Mic,Video,Info,Emoji,Feed,Setting,Search,Threads,Menu}
+export {Home,Heart,Tagged,Bookmark,Chat, Explore,Image,Inbox,Message,Posts,Reels,Share,Create,Following,Favorite,Messenger,Phone,Mic,Video,Info,Emoji,Feed,Setting,Search,Threads,Menu, Insta,Instagram,MessageWarning, Activity}
