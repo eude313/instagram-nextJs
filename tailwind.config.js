@@ -11,6 +11,18 @@ module.exports = {
   ],
   theme: {
     extend: {
+      animation: {
+        'comet-spin': 'comet-spin 4s linear infinite',
+      },
+      keyframes: {
+        'comet-spin': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+      },
+    },
+    images: {
+      domains: ['i.pravatar.cc', 'via.placeholder.com'],
     },
   },
   darkMode: "class",

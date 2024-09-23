@@ -1,248 +1,234 @@
-"use client";
+import React, { useState, useEffect } from 'react';
+import { Button, Input, Card, Modal, Avatar } from '@nextui-org/react';
+import ApiService from '@/services/ApiService';
 
-import React, { useState} from 'react';
-import Link from 'next/link';
-import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,Input, Tooltip } from "@nextui-org/react";
-import { Messenger, Create, Explore, Heart, Home, Reels, Search, Menu, Threads, Insta, Instagram } from '@/icons';
-import { ThemeSwitch } from '../ThemeSwitch';
-import ScaleUpHorLeft from '../ScaleUpHorLeft';
+export default function PostManagement() {
+  const [posts, setPosts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [postFile, setPostFile] = useState(null);
+  const [postCaption, setPostCaption] = useState('');
+  const [comment, setComment] = useState('');
 
-const linkItems = `flex items-center justify-center md:justify-start py-3 px-4 hover:bg-[#F2F2F2] rounded-lg transition-colors duration-300 font-medium focus:font-bold focus:border focus:border-white dark:text-gray-300 dark:hover:bg-[#1A1A1A] dark:hover:text-white rounded-md transition-colors duration-300`;
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
-const sidebarStyles=`fixed top-0 left-0 w-[390px] h-screen bg-inherit bg-white dark:bg-black border-r border-r-[#262626] shadow-lg rounded-r-lg transition-transform duration-300`
-
-export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSmall }) {
-  const [isSearchSidebarOpen, setSearchSidebarOpen] = useState(false);
-  const [isNotificationsSidebarOpen, setNotificationsSidebarOpen] = useState(false);
-
-  const handleSearchClick = () => {
-    setSearchSidebarOpen(!isSearchSidebarOpen);
-    if (isNotificationsSidebarOpen) setNotificationsSidebarOpen(false);
+  const fetchPosts = async () => {
+    try {
+      const data = await ApiService.getPosts();
+      setPosts(data.results);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
   };
 
-  const handleNotificationsClick = () => {
-    setNotificationsSidebarOpen(!isNotificationsSidebarOpen);
-    if (isSearchSidebarOpen) setSearchSidebarOpen(false); 
+  const handleFileChange = (event) => {
+    setPostFile(event.target.files[0]);
   };
 
-  const handleMessagesClick = () => {
-    setIsMessagesPage(true);
+  const handleUpload = async () => {
+    if (!postFile) {
+      alert('Please select a file to upload');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', postFile);
+    formData.append('caption', postCaption);
+
+    try {
+      await ApiService.createPost(formData);
+      setIsModalOpen(false);
+      setPostFile(null);
+      setPostCaption('');
+      fetchPosts();
+    } catch (error) {
+      console.error('Error uploading post:', error);
+    }
+  };
+
+  const handleLike = async (postId) => {
+    try {
+      await ApiService.likePost(postId);
+      fetchPosts();
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
+  const handleComment = async (postId) => {
+    try {
+      await ApiService.addComment(postId, { content: comment });
+      setComment('');
+      fetchPosts();
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
+  const handleSave = async (postId) => {
+    try {
+      await ApiService.savePost(postId);
+      fetchPosts();
+    } catch (error) {
+      console.error('Error saving post:', error);
+    }
+  };
+
+  const handleShare = async (postId) => {
+    try {
+      const { share_link } = await ApiService.getShareLink(postId);
+      // Here you might want to use a library like react-share to implement social sharing
+      alert(`Share this link: ${share_link}`);
+    } catch (error) {
+      console.error('Error getting share link:', error);
+    }
   };
 
   return (
-    <div className='h-screen flex'>
-      <div className={`flex flex-col transition-all duration-300 ${isSearchSidebarOpen || isNotificationsSidebarOpen  || isMessagesPage 
-         || isScreenSmall ? 'w-auto' : 'w-full'} z-20`}>
-        <div className="py-6 pl-3">
-          {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-          <Insta className="mx-[15px]"/>
-          ) : (
-            <Instagram/>
-          )}
-        </div>
-        <div className="flex flex-col space-y-2">
-          <Tooltip showArrow={true} content="Home" placement="right">
-            <Link href="/" className={linkItems}>
-              {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-              || isScreenSmall ? (
-              <Home className="md:mr-0" />
-              ) : (
-                <div className="flex">
-                  <Home className="md:mr-0" />
-                  <span  className="ml-2 xl:ml-4">Home</span>
-                </div>
-              )}
-            </Link>
-          </Tooltip>
-           <Tooltip showArrow={true} content="Search" placement="right">
-          <button onClick={handleSearchClick} className={linkItems}>
-            {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-            <Search className="md:mr-0" />
-            ) : (
-              <div className="flex">
-                <Search className="md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Search</span>
-              </div>
-            )}
-          </button></Tooltip>
-           <Tooltip showArrow={true} content="Explore" placement="right">
-          <Link href="/explore" className={linkItems}>
-            {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-            <Explore className="md:mr-0" />
-            ) : (
-              <div className="flex">
-                <Explore className="md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Explore</span>
-              </div>
-            )}
-          </Link></Tooltip>
-           <Tooltip showArrow={true} content="Reels" placement="right">
-          <Link href="/reels" className={linkItems}>
-            {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-            <Reels className="md:mr-0" />
-            ) : (
-              <div className="flex">
-                <Reels className="md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Reels</span>
-              </div>
-            )}
-          </Link></Tooltip>
-           <Tooltip showArrow={true} content="Direct" placement="right">
-          <Link href="/direct" className={linkItems} onClick={handleMessagesClick} >
-            {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-            <Messenger className="md:mr-0" />
-            ) : (
-              <div className="flex">
-                <Messenger className="md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Messages</span>
-              </div>
-            )}
-          </Link></Tooltip>
-           <Tooltip showArrow={true} content="Notiffications" placement="right">
-          <button onClick={handleNotificationsClick} className={linkItems}>
-            {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-            <Heart className="md:mr-0" />
-            ) : (
-              <div className="flex">
-                <Heart className="md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Notifications</span>
-              </div>
-            )}
-          </button></Tooltip>
+    <div>
+      <Button onClick={() => setIsModalOpen(true)}>Create New Post</Button>
 
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-               <Tooltip showArrow={true} content="Create" placement="right">
-              <div className={linkItems}>
-                {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-              || isScreenSmall ? (
-                <Create className="md:mr-0" />
-              ) : (
-              <div className="flex">
-                <Create className="md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Create</span>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Modal.Header>Create New Post</Modal.Header>
+        <Modal.Body>
+          <Input type="file" onChange={handleFileChange} accept="image/*, video/*" />
+          <Input
+            placeholder="Add a caption..."
+            value={postCaption}
+            onChange={(e) => setPostCaption(e.target.value)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleUpload}>Post</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <div className="posts">
+        {posts.map((post) => (
+          <Card key={post.id} className="mb-4">
+            <Card.Body>
+              <div className="flex items-center mb-2">
+                <Avatar src={post.user.profile_picture} alt={post.user.username} />
+                <span className="ml-2">{post.user.username}</span>
               </div>
-            )}
-              </div></Tooltip>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" className="w-[266px] px-[6px] h-max-[405px] p-[8px]">
-              <DropdownItem key="help_and_feedback" className={linkItems}>Switch accounts</DropdownItem>
-              <DropdownItem key="logout" className={linkItems}>
-                Log Out
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-           <Tooltip showArrow={true} content="Profile" placement="right">
-          <Link href="/accounts" className={linkItems}>
-            {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-            <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" className="w-6 h-6 text-tiny md:mr-0" />
-            ) : (
-              <div className="flex">
-                <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" className="w-6 h-6 text-tiny md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Profile</span>
+              <img src={post.media_items[0].file} alt="Post" className="w-full mb-2" />
+              <p>{post.caption}</p>
+              <div className="flex justify-between mt-2">
+                <Button onClick={() => handleLike(post.id)}>Like ({post.likes_count})</Button>
+                <Button onClick={() => handleSave(post.id)}>Save</Button>
+                <Button onClick={() => handleShare(post.id)}>Share</Button>
               </div>
-            )}
-          </Link></Tooltip>
-        </div>
-        <div className="mt-auto mb-4">
-           <Tooltip showArrow={true} content="Threads" placement="right">
-          <Link href="#" className={`hide-on-small-height ${linkItems}`}>
-            {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-            <Threads className="md:mr-0" />
-            ) : (
-              <div className="flex">
-                <Threads className="md:mr-0" />
-                <span  className="ml-2 xl:ml-4">Threads</span>
+              <div className="mt-2">
+                <Input
+                  placeholder="Add a comment..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+                <Button onClick={() => handleComment(post.id)}>Comment</Button>
               </div>
-            )}
-          </Link></Tooltip>
-          <Dropdown placement="top-end">
-            <DropdownTrigger>
-               <Tooltip showArrow={true} content="More" placement="right">
-              <div className={linkItems}>
-                {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage 
-            || isScreenSmall ? (
-                <Menu className="md:mr-0" />
-                ) : (
-                  <div className="flex">
-                    <Menu className="md:mr-0" />
-                    <span  className="ml-2 xl:ml-4">More</span>
-                  </div>
-                )}
-              </div></Tooltip>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" className="w-[266px] px-[6px] h-max-[405px] p-[8px]">
-              <DropdownItem key="profile" className={linkItems}>
-                Settings
-              </DropdownItem>
-              <DropdownItem key="settings" className={linkItems}>Your activity</DropdownItem>
-              <DropdownItem key="team_settings" className={linkItems}>Saved</DropdownItem>
-              <DropdownItem key="analytics" className={linkItems}>
-                Switch appearance <ThemeSwitch />
-              </DropdownItem>
-              <DropdownItem key="system" className={linkItems}>Report a problem</DropdownItem>
-              <DropdownItem key="configurations" className={`divide-y border-[#262626] ${linkItems}`}>Threads</DropdownItem>
-              <DropdownItem key="help_and_feedback" className={linkItems}>Switch accounts</DropdownItem>
-              <DropdownItem key="logout" className={linkItems}>
-                Log Out
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        </div>
+              <div className="mt-2">
+                {post.comments.map((comment) => (
+                  <p key={comment.id}><strong>{comment.user.username}</strong>: {comment.content}</p>
+                ))}
+              </div>
+            </Card.Body>
+          </Card>
+        ))}
       </div>
+    </div>
+  );
+}
 
 
-      {/* Search Sidebar */}
-      <ScaleUpHorLeft>
-        <div className= {`${sidebarStyles} ${isSearchSidebarOpen ? 'translate-x-[70px]' : '-translate-x-full'} z-0}`}>
-            {/* <button onClick={handleSearchClick} className="p-4">
-            Close
-            </button> */}
-            <div className="px-[24px]">
-                <div className='pb-[12px] pt-[36px] spacing'>
-                    <h1 className='font-bold text-2xl'>
-                        Search
-                    </h1>
-                </div>
-                <Input type="search"  className='pb-[4px] pt-[20px]' placeholder="Search" startContent={
-                <Search className="text-lg text-default-400 pointer-events-none flex-shrink-0" /> }/>
-            </div>
-            <hr class="my-4 border-[1px] border-[#262626]"/>
-            <div className="px-[24px] overflow-y-auto">
-                <h2 className='mt-[6px] mx-[24px] mb-[8px] pt-[4px] font-bold'>
-                    Recents
-                </h2>
-                <div clasName='flex border flex-row gap-2'>
-                    <div>
-                        <Avatar isBordered src="https://i.pravatar.cc/150?u=a042581f4e29026024d" /> 
-                    </div>
-                    <div>
-                        <p className='text-sm font-semibold'>kshdkbckidsab</p>
-                        <p className='text-sm font-light'>kdanckadndkjkasnckad</p>
-                    </div>
-                </div>
-            </div>
+# story
 
-        </div>
-      </ScaleUpHorLeft>
+import React, { useState, useEffect } from 'react';
+import { Button, Input, Card, Modal } from '@nextui-org/react';
+import ApiService from '@/services/ApiService';
 
-      {/* Notifications Sidebar */} 
-      <ScaleUpHorLeft>
-        <div className= {`${sidebarStyles} ${isNotificationsSidebarOpen ? 'translate-x-[70px]' : '-translate-x-full'} z-0}`}>
-            <button onClick={handleNotificationsClick} className="p-4">
-            Close
-            </button>
-            {/* Add your notifications sidebar content here */}
-        </div>
-      </ScaleUpHorLeft>
+export default function StoryManagement() {
+  const [myStories, setMyStories] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [storyFile, setStoryFile] = useState(null);
+  const [storyCaption, setStoryCaption] = useState('');
+
+  useEffect(() => {
+    fetchMyStories();
+  }, []);
+
+  const fetchMyStories = async () => {
+    try {
+      const data = await ApiService.getMyStories();
+      setMyStories(data);
+    } catch (error) {
+      console.error('Error fetching my stories:', error);
+    }
+  };
+
+  const handleFileChange = (event) => {
+    setStoryFile(event.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    if (!storyFile) {
+      alert('Please select a file to upload');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', storyFile);
+    formData.append('caption', storyCaption);
+
+    try {
+      await ApiService.createStory(formData);
+      setIsModalOpen(false);
+      setStoryFile(null);
+      setStoryCaption('');
+      fetchMyStories();
+    } catch (error) {
+      console.error('Error uploading story:', error);
+    }
+  };
+
+  const handleDelete = async (storyId) => {
+    try {
+      await ApiService.deleteStory(storyId);
+      fetchMyStories();
+    } catch (error) {
+      console.error('Error deleting story:', error);
+    }
+  };
+
+  return (
+    <div>
+      <Button onClick={() => setIsModalOpen(true)}>Upload New Story</Button>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Modal.Header>Upload New Story</Modal.Header>
+        <Modal.Body>
+          <Input type="file" onChange={handleFileChange} accept="image/*, video/*" />
+          <Input
+            placeholder="Add a caption..."
+            value={storyCaption}
+            onChange={(e) => setStoryCaption(e.target.value)}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleUpload}>Upload</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <div className="my-stories">
+        {myStories.map((story) => (
+          <Card key={story.id}>
+            <Card.Body>
+              <p>{story.caption}</p>
+              <Button onClick={() => handleDelete(story.id)}>Delete</Button>
+            </Card.Body>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
@@ -250,13 +236,97 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
 
 
 
+import ApiService from '@/lib/ApiService';
+import EmojiPicker from 'emoji-picker-react';
+import { AnimatePresence } from 'framer-motion';
+import { useLike } from "@/contexts/LikeContext";
+import HoverContent from '../Hoover/HoverContent';
+import { usePostModal } from '@/hooks/usePostModal';
+import HoverComponent from '../Hoover/HoverComponent';
+import { Avatar, Image, Button } from "@nextui-org/react";
+import React, { useState, useEffect, useRef } from 'react';
+import ScaleUpVertBottom from '@/Animation/ScaleUpVertBottom';
+import { Bookmark, Chat, DotsMenu, Emoji, Heart, Share } from '@/icons'; 
+
+// import { Navigation, A11y } from 'swiper/modules';
+// import { Swiper, SwiperSlide } from 'swiper/react';
+
+// import 'swiper/css';
+// import 'swiper/css/navigation';
 
 
+export default function Posts({posts}) {
+  const { openPostModal } = usePostModal();
+  const [comment, setComment] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const emojiPickerRef = useRef(null);
+  const { likes, toggleLike } = useLike();
+  const [lastTap, setLastTap] = useState(0);
+  const [showHeart, setShowHeart] = useState(false);
 
+  
+  const toggleEmojiPicker = () => {
+    setIsOpen(!isOpen);
+  };
 
+  const handleEmojiSelect = (emojiObject) => {
+    setComment(prevComment => prevComment + emojiObject.emoji);
+  };
 
+  const handleInputChange = (e) => {
+    setComment(e.target.value);
+  };
 
+  const handleClickOutside = (event) => {
+    if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
 
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
+  const handleDoubleTap = async (itemId) => {
+    try {
+      await ApiService.likePost(itemId); 
+      toggleLike(itemId); 
+      setShowHeart(true);
+      setTimeout(() => setShowHeart(false), 1000);
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
 
+  const handleTap = (e, itemId) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
 
+    if (tapLength < 300 && tapLength > 0) {
+      handleDoubleTap(itemId);
+      e.preventDefault();
+    }
+
+    setLastTap(currentTime);
+  };
+
+  const handleSave = async (postId) => {
+    try {
+      await ApiService.savePost(postId); 
+      alert("Post saved successfully");
+    } catch (error) {
+      console.error('Error saving post:', error);
+    }
+  };
+
+  const handleShare = async (postId) => {
+    try {
+      const { share_link } = await ApiService.getShareLink(postId); 
+      alert(`Share this link: ${share_link}`);
+    } catch (error) {
+      console.error('Error getting share link:', error);
+    }
+  };

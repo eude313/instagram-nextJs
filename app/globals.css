@@ -9,7 +9,10 @@ background(modal,dropdown)
       #3C3C3C   -hoover
 text: #808080
 button:#1877F2
-border:#262626 */
+border:#262626
+ 
+ 
+*/
 
 * {
   margin: 0;
@@ -46,4 +49,56 @@ body {
     padding-top: 40px;
     padding-bottom: 30px;
   }
+
+  .border-y-switch {
+    border-top-width: 3px;
+    border-bottom-width: 1px;
+  }
+}
+
+.custom-swiper .swiper-button-next,
+.custom-swiper .swiper-button-prev {
+  @apply p-2 rounded-full;
+
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-swiper .swiper-button-next,
+.custom-swiper .swiper-button-prev {
+  background-color: black;
+}
+
+.custom-swiper .swiper-button-next::after,
+.custom-swiper .swiper-button-prev::after {
+  color: black;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .custom-swiper .swiper-button-next:hover,
+  .custom-swiper .swiper-button-prev:hover {
+    background-color: white;
+  }
+
+  .custom-swiper .swiper-button-next,
+  .custom-swiper .swiper-button-prev {
+    background-color: #B4B4B4;
+    transition: all;
+  }
+}
+
+.custom-swiper .swiper-button-next.swiper-button-disabled,
+.custom-swiper .swiper-button-prev.swiper-button-disabled {
+  display: none;
+}
+
+.border-gradient {
+  background: linear-gradient(to right, red, yellow, purple);
+  border-radius: 9999px;
 }
