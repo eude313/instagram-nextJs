@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Instagram } from "@/icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, Card, CardBody, CardHeader, Image, Divider } from "@nextui-org/react";
 import axiosInstance from "@/lib/axiosInstance"; 
@@ -11,9 +11,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = React.useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,14 +32,24 @@ export default function LoginPage() {
         
         router.push("/"); 
       } else {
-        console.error("Login failed");
+        setErrorMessage("Login failed");
       }
     } catch (error) {
-      console.error("Login error:", error.response ? error.response.data : error.message);
+      setErrorMessage(error.response ? error.response.data.detail : "Login error. Please try again."); 
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 5000); 
+
+      return () => clearTimeout(timer); 
+    }
+  }, [errorMessage]);
 
   return (
     <div className="w-screen h-screen  flex justify-center align-center">
@@ -54,6 +65,11 @@ export default function LoginPage() {
               <Instagram width="170" height='50' className='mb-5'/>
             </CardHeader>
             <CardBody className="px-4">
+              {errorMessage && (
+                <div className="bg-red-500 text-white mb-1.5 text-center py-2">
+                  <p>{errorMessage}</p>
+                </div>
+              )}
               <form onSubmit={handleLogin} className="space-y-4 mb-3">
                 <Input
                   required 
@@ -142,8 +158,8 @@ export default function LoginPage() {
 
           <Card className="shadow-none rounded-none w-[340px] mt-2 px-2">
             <CardBody>
-              <div class="text-center pb-1 mb-2">
-                <small class="text-sm">Get the app.</small>
+              <div className="text-center pb-1 mb-2">
+                <small className="text-sm">Get the app.</small>
               </div>
               <Link href='#'>
                 <Image

@@ -14,7 +14,7 @@ export default function Navbar() {
         <DropdownTrigger>
           <Button className="text-medium bg-inherit mt-1" endContent={
             <span className="rotate-180">
-              <Back/>
+              <Back width="15" height='15'/>
             </span>
           }>
             Username
