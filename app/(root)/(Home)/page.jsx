@@ -4,58 +4,71 @@ import Posts from "@/components/Posts";
 import ApiService from '@/lib/ApiService';
 import { Spinner } from "@nextui-org/react";
 import { useRouter } from 'next/navigation';
-import React, { useState, useEffect } from "react";
-import { useInView } from 'react-intersection-observer'; 
-
+import React, { useState, useEffect, useCallback } from "react";
+import { useInView } from 'react-intersection-observer';
 
 export default function Page() {
   const router = useRouter();
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const { ref, inView } = useInView({ threshold: 1.0, triggerOnce: false }); 
-
+  const [loading, setLoading] = useState(false);
+  const { ref, inView } = useInView({ threshold: 1.0, triggerOnce: false });
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token'); 
+    const token = localStorage.getItem('access_token');
     if (!token) {
-      router.push('/auth/login');  
+      router.push('/auth/login');
     }
   }, [router]);
 
+  const fetchPosts = useCallback(async () => {
+    if (loading || !hasMore) return;
+
+    try {
+      setLoading(true);
+      const response = await ApiService.getPosts(page);
+      if (response.results && response.results.length > 0) {
+        setPosts(prevPosts => {
+          const newPosts = response.results.filter(
+            newPost => !prevPosts.some(existingPost => existingPost.id === newPost.id)
+          );
+          return [...prevPosts, ...newPosts];
+        });
+        setPage(prevPage => prevPage + 1);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setHasMore(false);
+      } else {
+        console.error('Error fetching posts:', error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [page, loading, hasMore]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   useEffect(() => {
     if (inView && hasMore && !loading) {
-      setPage((prevPage) => prevPage + 1); 
+      fetchPosts();
     }
-  }, [inView, hasMore, loading]);
-
- 
-  useEffect(() => {
-    fetchPosts();
-  }, [page]);
-
-  const fetchPosts = async () => {
-    try {
-      const data = await ApiService.getPosts(page);
-      setPosts((prevPosts) => [...prevPosts, ...data.results]);
-      if (data.results.length === 0) setHasMore(false); 
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    }
-  };
+  }, [inView, hasMore, loading, fetchPosts]);
 
   return (
+
     <div className='w-auto'>
-      <div>
-        <Posts posts={posts} />
-      </div>
-      
-      <div ref={ref} className="flex justify-center my-4">
-        {loading &&  <Spinner size="sm"/>}
-        {!hasMore && <p>No more posts</p>}
-      </div>
+      {posts.map((post) => (
+        <Posts key={post.id} post={post} />
+      ))}
+      {loading && <div className="flex justify-center"><Spinner /></div>}
+      {!hasMore && <div className="text-center text-gray-500">No more posts</div>}
+      <div ref={ref} style={{ height: '10px' }}></div>
     </div>
   );
 }

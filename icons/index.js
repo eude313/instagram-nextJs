@@ -38,7 +38,15 @@ import Mute from './Mute';
 import UnMute from './UnMute';
 import Music from './Music';
 import Lock from './Lock';
+import CheckMark from './CheckMark';
+import Remove from './Remove';
+import Person from './Person';
+import UnLike from './UnLike';
 export {
+    Person,
+    Remove,
+    UnLike,
+    CheckMark,
     Lock,
     Music,
     Mute,

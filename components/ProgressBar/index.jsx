@@ -27,7 +27,7 @@ const ProgressBar = () => {
         className="h-full rounded-full transition-all duration-500"
         style={{
           width: `${progress}%`,
-          background: 'linear-gradient-to-br from-purple-700 to-yellow-400 via-pink-500',
+          background: 'bg-gradient-to-r from-purple-700 to-yellow-400 via-pink-500',
         }}
       ></div>
     </div>

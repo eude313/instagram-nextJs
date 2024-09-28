@@ -8,7 +8,8 @@ background(modal,dropdown)
       #1A1A1A   -current
       #3C3C3C   -hoover
 text: #808080
-button:#1877F2
+button:#1877F2   
+button-disabled:#002D4A
 border:#262626
  
  
@@ -27,6 +28,92 @@ body {
 .great-vibes-regular {
   font-family: "Great Vibes", cursive;
   font-style: normal;
+}
+
+/* .animated-gradient {
+  background: linear-gradient(90deg, #783BF6, #EF0187, #F6CC10);
+  background-size: 300% 100%;
+  animation: gradient-animation 3s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+} */
+
+.animated-gradient {
+  background: linear-gradient(104deg, #783bf6, #fdcd00, #ef0187, #783bf6, #f6cc10);
+  background-size: 1000% 1000%;
+
+  -webkit-animation: gradient 17s ease infinite;
+  -moz-animation: gradient 17s ease infinite;
+  -o-animation: gradient 17s ease infinite;
+  animation: gradient 17s ease infinite;
+}
+
+@-webkit-keyframes gradient {
+  0% {
+    background-position: 0% 22%
+  }
+
+  50% {
+    background-position: 100% 79%
+  }
+
+  100% {
+    background-position: 0% 22%
+  }
+}
+
+@-moz-keyframes gradient {
+  0% {
+    background-position: 0% 22%
+  }
+
+  50% {
+    background-position: 100% 79%
+  }
+
+  100% {
+    background-position: 0% 22%
+  }
+}
+
+@-o-keyframes gradient {
+  0% {
+    background-position: 0% 22%
+  }
+
+  50% {
+    background-position: 100% 79%
+  }
+
+  100% {
+    background-position: 0% 22%
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 22%
+  }
+
+  50% {
+    background-position: 100% 79%
+  }
+
+  100% {
+    background-position: 0% 22%
+  }
 }
 
 .dark .custom-dropdown-bg {

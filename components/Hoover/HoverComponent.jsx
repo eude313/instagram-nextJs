@@ -1,9 +1,12 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useMediaQuery } from '@/hooks/useMediaQuery'; 
 
 export default function HoverComponent({ children, hoverContent }) {
   const [isHovered, setIsHovered] = useState(false);
   const [theme, setTheme] = useState('light');
+  const [positionStyles, setPositionStyles] = useState({});
+  const hoverRef = useRef(null);
+  const isMediumScreen = useMediaQuery('(min-width: 640px)');
 
   useEffect(() => {
     const handleThemeChange = () => {
@@ -12,16 +15,35 @@ export default function HoverComponent({ children, hoverContent }) {
     };
 
     handleThemeChange();
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleThemeChange); 
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleThemeChange);
 
     return () => {
-      window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleThemeChange); 
+      window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleThemeChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (isHovered && hoverRef.current) {
+      const rect = hoverRef.current.getBoundingClientRect();
+      const newPositionStyles = {};
+
+      if (rect.right > window.innerWidth) {
+        newPositionStyles.left = `-${rect.right - window.innerWidth + 10}px`; 
+      }
+      if (rect.bottom > window.innerHeight) {
+        newPositionStyles.top = `-${rect.bottom - window.innerHeight + 10}px`; 
+      }
+      setPositionStyles(newPositionStyles);
+    }
+  }, [isHovered]);
 
   const boxShadowStyle = theme === 'dark' 
     ? '0px 10px 25px 6px rgba(255, 255, 255, 0.2)' 
     : '0px 10px 25px 6px rgba(0, 0, 0, 0.2)';    
+
+  if (!isMediumScreen) {
+    return <>{children}</>; 
+  }
 
   return (
     <div
@@ -32,9 +54,10 @@ export default function HoverComponent({ children, hoverContent }) {
       {children}
 
       {isHovered && (
-        <div 
-          className="absolute top-10 left-0 z-50 rounded-lg transition-all duration-300 bg-white dark:bg-black "
-          style={{ boxShadow: boxShadowStyle }} 
+        <div
+          ref={hoverRef}
+          className="absolute top-10 left-0 z-50 rounded-lg transition-all duration-300 bg-white dark:bg-black"
+          style={{ ...positionStyles, boxShadow: boxShadowStyle }}
         >
           {hoverContent}
         </div>
