@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, Image, Button } from "@nextui-org/react";
-import { Bookmark, Chat, CheckMark, DotsMenu, Emoji, Heart, Share, Remove, UnLike, Person, Mute } from '@/icons'; 
+import { Bookmark, Chat, CheckMark, DotsMenu, Emoji, Heart, Share, Remove, UnLike, Person, Mute, UnMute  } from '@/icons'; 
 import { useLike } from "@/contexts/LikeContext";
 import { usePostModal } from '@/hooks/usePostModal';
 import HoverComponent from '../Hoover/HoverComponent';
@@ -23,11 +23,14 @@ const Posts = ({ post }) => {
   const { likes, toggleLike } = useLike();
   const { openPostModal } = usePostModal();
   const [lastTap, setLastTap] = useState(0);
-  const [comment, setComment] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [savedPosts, setSavedPosts] = useState({});
   const [showHeart, setShowHeart] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const [comment, setComment] = useState("");
+  const [latestComment, setLatestComment] = useState(null);
 
   const hasStory = post.user.has_story;
   const isAdmin = post.user.is_staff;
@@ -54,10 +57,6 @@ const Posts = ({ post }) => {
 
   const handleEmojiSelect = (emojiObject) => {
     setComment(prevComment => prevComment + emojiObject.emoji);
-  };
-
-  const handleInputChange = (e) => {
-    setComment(e.target.value);
   };
 
   const handleClickOutside = (event) => {
@@ -169,6 +168,39 @@ const Posts = ({ post }) => {
     }
   };
 
+  const handleMuteToggle = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
+ 
+  
+  useEffect(() => {
+    if (post.latest_comment) {
+      setLatestComment(post.latest_comment);
+    }
+  }, [post]);
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (comment.trim()) {
+        const newComment = await ApiService.postComment(post.id, comment);
+        setLatestComment(newComment);
+        setComment(""); // Clear the input
+      }
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    }
+  };
+
+
+  const handleInputChange = (e) => {
+    setComment(e.target.value);
+  };
+
   const renderMedia = () => {
     if (post.media && post.media.length > 0) {
       if (post.media.length === 1) {
@@ -179,16 +211,25 @@ const Posts = ({ post }) => {
             src={media.media_file} 
             className="w-full h-auto md:rounded-md" />
         ) : (
+          
           <div className="h-[585px] w-full md:rounded-md relative overflow-hidden">
             <video  
               loop
               autoPlay
               playsInline 
               ref={videoRef}
-              muted={!isInView}
+              muted={isMuted}
               src={media.media_file}
               onClick={handleVideoClick}
               className="absolute top-0 left-0 w-full h-full object-contain" />
+             <Button
+              isIconOnly
+              aria-label="mute/UnMute"
+              onClick={handleMuteToggle}
+              className="bg-inherit absolute bottom-2 right-2 z-20 text-white"
+            >
+              {isMuted ? <Mute /> : <UnMute />}
+            </Button> 
           </div>
 
         );
@@ -209,10 +250,18 @@ const Posts = ({ post }) => {
                       autoPlay
                       playsInline 
                       ref={videoRef}
-                      muted={!isInView}
+                      muted={isMuted}
                       src={media.media_file}
                       onClick={handleVideoClick}
                       className="absolute top-0 left-0 w-full h-full object-contain" />
+                    <Button
+                      isIconOnly
+                      aria-label="mute/unmute"
+                      onClick={handleMuteToggle}
+                      className="absolute bottom-2 right-2 z-20 bg-black/50 text-white"
+                    >
+                      {isMuted ? <Mute /> : <Unmute />}
+                    </Button>
                   </div>
                 
                 )}
@@ -277,9 +326,6 @@ const Posts = ({ post }) => {
             {likes[post.id]?.isLiked ? <Heart /> : <UnLike />}
           </Button>
         )}
-        <Button radius='full' isIconOnly aria-label="mute/unmute" className="absolute bottom-0 right-0 z-20 bg-inherit">
-          <Mute />
-        </Button>
       </div>
 
       <div className="pb-1">
@@ -314,38 +360,45 @@ const Posts = ({ post }) => {
             ) : (
               <p>{likes[post.id]?.likeCount} likes</p>
             )}
+            {latestComment && (
+              <div className="comment-item">
+                <p><strong>{latestComment.user.username}</strong>: {latestComment.content}</p>
+              </div>
+            )}
             <small>{post.created_at}</small>
           </div>
         </div>
-        <div className="pb-3 w-full flex flex-row relative border-b border-[#DBDBDB] dark:border-[#262626]">
-          <input
-            type="text"
-            placeholder="Add a comment..."
-            value={comment}
-            onChange={handleInputChange}
-            className="ml-[12px] md:ml-0 bg-inherit grow h-8 mt-1 border-none outline-none"
-          />
-          <h2
-            type='submit'
-            className={`mt-2 mr-[12px] md:mr-0 cursor-pointer font-semibold text-[#1877F2] ${!comment ? 'hidden' : 'block'}`}>
-            Post
-          </h2>
-          <Button isIconOnly aria-label="emoji" onClick={toggleEmojiPicker} className={`bg-inherit mt-2 mr-[12px] md:mr-0 cursor-pointer ${!comment ? 'block' : 'hidden'}`}>
-            <Emoji />
-          </Button>
-          <AnimatePresence>
-            {isOpen && (
-              <ScaleUpVertBottom isVisible={isOpen}>
-                <div className="bg-white dark:bg-black border-t border-t-[#262626] p-4 shadow-lg z-30 absolute bottom-[38px] right-0 left-0 w-full" ref={emojiPickerRef}>
-                  <EmojiPicker 
-                    className="w-full bg-inherit border-none rounded-none"
-                    theme="auto"
-                    onEmojiClick={handleEmojiSelect}
-                  />
-                </div>
-              </ScaleUpVertBottom>
-            )}
-          </AnimatePresence>
+        <div className="pb-3 w-full relative border-b border-[#DBDBDB] dark:border-[#262626]">
+          <form onSubmit={handleCommentSubmit} className="flex flex-row">
+            <input
+              type="text"
+              placeholder="Add a comment..."
+              value={comment}
+              onChange={handleInputChange}
+              className="ml-[12px] md:ml-0 bg-inherit grow h-8 mt-1 border-none outline-none"
+            />
+            <button
+              type='submit'
+              className={`mt-2 mr-[12px] md:mr-0 cursor-pointer font-semibold text-[#1877F2] ${!comment ? 'hidden' : 'block'}`}>
+              Post
+            </button>
+            <Button isIconOnly aria-label="emoji" onClick={toggleEmojiPicker} className={`bg-inherit mt-2 mr-[12px] md:mr-0 cursor-pointer ${!comment ? 'block' : 'hidden'}`}>
+              <Emoji />
+            </Button>
+            <AnimatePresence>
+              {isOpen && (
+                <ScaleUpVertBottom isVisible={isOpen}>
+                  <div className="bg-white dark:bg-black border-t border-t-[#262626] p-4 shadow-lg z-30 absolute bottom-[38px] right-0 left-0 w-full" ref={emojiPickerRef}>
+                    <EmojiPicker 
+                      className="w-full bg-inherit border-none rounded-none"
+                      theme="auto"
+                      onEmojiClick={handleEmojiSelect}
+                    />
+                  </div>
+                </ScaleUpVertBottom>
+              )}
+            </AnimatePresence>
+          </form>
         </div>
       </div>
     </div>
