@@ -1,27 +1,37 @@
-'use client';
+import { useCallback, useEffect } from 'react';
+import { useModal } from '@/contexts/ModalContext';
+import { useRouter } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
-import { useCallback } from 'react';
-import { useModal } from '@/contexts/ModalContext';  
-
-export function usePostModal(router) {
-  const { openModal, closeModal, isOpen, modalContent } = useModal();
+export function usePostModal() {
+  const { modalState, openModal, closeModal } = useModal();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const openPostModal = useCallback((postId) => {
-    openModal({ type: 'post', postId });
-    if (router) {
-      router.push(`?postId=${postId}`, undefined, { shallow: true });
-    }
-  }, [openModal, router]);
+    openModal('post', { postId });
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set('postId', postId);
+    router.push(`${pathname}?${newSearchParams.toString()}`, { shallow: true });
+  }, [openModal, router, pathname, searchParams]);
 
   const closePostModal = useCallback(() => {
     closeModal();
-    if (router) {
-      router.push(router.pathname, undefined, { shallow: true });
-    }
-  }, [closeModal, router]);
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.delete('postId');
+    router.push(`${pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`, { shallow: true });
+  }, [closeModal, router, pathname, searchParams]);
 
-  const isPostModalOpen = isOpen && modalContent?.type === 'post';
-  const currentPostId = isPostModalOpen ? modalContent.postId : null;
+  useEffect(() => {
+    const postId = searchParams.get('postId');
+    if (postId && !modalState.isOpen) {
+      openModal('post', { postId });
+    }
+  }, [searchParams, modalState.isOpen, openModal]);
+
+  const isPostModalOpen = modalState.isOpen && modalState.type === 'post';
+  const currentPostId = isPostModalOpen ? modalState.data.postId : null;
 
   return { openPostModal, closePostModal, isPostModalOpen, currentPostId };
 }

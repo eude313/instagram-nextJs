@@ -1,18 +1,28 @@
 'use client';
 
 import React from 'react';
-import { Modal, ModalContent, ModalBody, Image, Avatar} from "@nextui-org/react";
-import { usePostModal } from '@/hooks/usePostModal'; 
-import {Bookmark, Chat, DotsMenu, Emoji, Heart, Share,Close} from '@/icons'; 
+import ApiService from '@/lib/ApiService';
 import EmojiPicker from 'emoji-picker-react';
 import { AnimatePresence } from 'framer-motion';
+import { usePostModal } from '@/hooks/usePostModal'; 
 import ScaleUpVertBottom from '@/Animation/ScaleUpVertBottom';
+import {Bookmark, Chat, DotsMenu, Emoji, Heart, Share,Close} from '@/icons'; 
+import { Modal, ModalContent, ModalBody, Image, Avatar} from "@nextui-org/react";
 
 export default function PostModal() {
   const { isPostModalOpen, currentPostId, closePostModal } = usePostModal();
   const [comment, setComment] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
   const emojiPickerRef = React.useRef(null);
+  const [post, setPost] = React.useState(null);
+
+  React.useEffect(() => {
+    if (currentPostId) {
+      ApiService.getPost(currentPostId)
+        .then(data => setPost(data))
+        .catch(error => console.error('Error fetching post:', error));
+    }
+  }, [currentPostId]);
 
   const handleInputChange = (e) => {
     setComment(e.target.value);
@@ -41,12 +51,6 @@ export default function PostModal() {
   }, []);
 
 
-  const post = currentPostId ? {
-    id: currentPostId,
-    content: `This is the content of post ${currentPostId}.`,
-    imageUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026024d'
-  } : null;
-
   if (!post) return null;
 
   return (
@@ -59,10 +63,14 @@ export default function PostModal() {
             body: "p-0 min-h-[60vh] bg-black",
             closeButton: "hidden",}}>
 
-            <button
-            onClick={closePostModal}
-            className="absolute top-0 right-0 m-4 p-2 z-999 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer"> 
-            <Close/> </button>
+            <Button
+                onPress={closePostModal}
+                isIconOnly aria-label="menu" className="bg-inherit absolute top-0 right-0 m-4"
+                // className="absolute top-0 right-0 m-4 p-2 z-999 rounded-full bg-white/10 hover:bg-white/20 text-white 
+                // cursor-pointer"
+                > 
+                <Close/> 
+            </Button>
     
             <ModalContent>
                 <ModalBody>

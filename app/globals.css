@@ -189,3 +189,54 @@ body {
   background: linear-gradient(to right, red, yellow, purple);
   border-radius: 9999px;
 }
+
+.css-selector {
+  background: linear-gradient(133deg, #3018f0, #f018de, #f0e218, #f01829);
+  background-size: 800% 800%;
+
+  -webkit-animation: AnimationName 16s ease infinite;
+  -moz-animation: AnimationName 16s ease infinite;
+  animation: AnimationName 16s ease infinite;
+}
+
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 0% 17%
+  }
+
+  50% {
+    background-position: 100% 84%
+  }
+
+  100% {
+    background-position: 0% 17%
+  }
+}
+
+@-moz-keyframes AnimationName {
+  0% {
+    background-position: 0% 17%
+  }
+
+  50% {
+    background-position: 100% 84%
+  }
+
+  100% {
+    background-position: 0% 17%
+  }
+}
+
+@keyframes AnimationName {
+  0% {
+    background-position: 0% 17%
+  }
+
+  50% {
+    background-position: 100% 84%
+  }
+
+  100% {
+    background-position: 0% 17%
+  }
+}

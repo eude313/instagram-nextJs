@@ -1,81 +1,127 @@
+// 'use client';
+
+
+// import Reel from '@/components/Reel';
+// import ProgressBar from '@/components/ProgressBar'
+// import React,{ Suspense, useState, useEffect } from "react";
+// import { Swiper, SwiperSlide } from 'swiper/react';
+// import ApiService from '@/lib/ApiService';
+
+
+// import 'swiper/css';
+
+
+// export default function ReelsPage() { 
+//   const [reelsData, setReelsData] = useState([]);
+
+//   useEffect(() => {
+//     const fetchReels = async () => {
+//       try {
+//         const data = await ApiService.getReels();
+//         console.log("API response:", data);
+//         if (data && Array.isArray(data.results)) {
+//           setReelsData(data.results);
+//         } else {
+//           console.error("API did not return expected structure:", data);
+//           setReelsData([]);
+//         }
+//       } catch (error) {
+//         console.error('Error fetching reels:', error);
+//         setReelsData([]);
+//       }
+//     };
+
+//     fetchReels();
+//   }, []);
+
+//   return (
+//     <div> 
+//       <Swiper
+//         slidesPerView={'auto'}
+//         scrollbar={{ draggable: true }}
+//         className="custom-swiper h-screen w-full"
+//         direction={'vertical'}>
+//         {Array.isArray(reelsData) ? (
+//         reelsData.map((reel) => (
+//           <SwiperSlide key={reel.id} className="w-full">
+//             <Suspense fallback={<ProgressBar/>}>
+//               <Reel reel={reel} />
+//             </Suspense>
+//           </SwiperSlide>
+//         ))
+//       ) : (
+//         <SwiperSlide className="w-full">
+//           <div>No reels available or data is loading...</div>
+//         </SwiperSlide>
+//       )}
+//       </Swiper>
+//     </div>
+//   );
+// }
 'use client';
 
-
 import Reel from '@/components/Reel';
-import ProgressBar from '@/components/ProgressBar'
-import React,{ Suspense, useState, useEffect } from "react";
+import ProgressBar from '@/components/ProgressBar';
+import React, { Suspense, useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import ApiService from '@/lib/ApiService';
-import { Image } from "@nextui-org/react"
-
+import { useRouter, usePathname } from 'next/navigation';
 
 import 'swiper/css';
 
-
-export default function page() { 
+export default function ReelsPage() {
   const [reelsData, setReelsData] = useState([]);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchReels = async () => {
       try {
         const data = await ApiService.getReels();
-        console.log("API response:", data);
         if (data && Array.isArray(data.results)) {
           setReelsData(data.results);
-        } else {
-          console.error("API did not return expected structure:", data);
-          setReelsData([]);
+
+          if (data.results.length > 0 && pathname === '/reels') {
+            router.push(`/reels/${data.results[0].id}`, { scroll: false });
+          }
         }
       } catch (error) {
         console.error('Error fetching reels:', error);
         setReelsData([]);
       }
     };
-  
+
     fetchReels();
-  }, []);
+  }, [router, pathname]);
+
+  const handleSlideChange = (swiper) => {
+    const activeIndex = swiper.activeIndex;
+    if (reelsData[activeIndex]) {
+      router.push(`/reels/${reelsData[activeIndex].id}`, { scroll: false });
+    }
+  };
+
   return (
-    <div> 
+    <div>
       <Swiper
         slidesPerView={'auto'}
         scrollbar={{ draggable: true }}
         className="custom-swiper h-screen w-full"
-        direction={'vertical'}>
-        {Array.isArray(reelsData) ? (
-        reelsData.map((reel) => (
-          <SwiperSlide key={reel.id} className="w-full">
-            <Suspense fallback={<ProgressBar/>}>
-              <Reel reel={reel} />
-            </Suspense>
+        direction={'vertical'}
+        onSlideChange={handleSlideChange}>
+        {Array.isArray(reelsData) && reelsData.length > 0 ? (
+          reelsData.map((reel) => (
+            <SwiperSlide key={reel.id} className="w-full">
+              <Suspense fallback={<ProgressBar />}>
+                <Reel reel={reel} />
+              </Suspense>
+            </SwiperSlide>
+          ))
+        ) : (
+          <SwiperSlide className="w-full">
+            <ProgressBar />
           </SwiperSlide>
-        ))
-      ) : (
-        <SwiperSlide className="w-full">
-          <div>No reels available or data is loading...</div>
-        </SwiperSlide>
-      )}
-        {/* <SwiperSlide className="w-full">
-            <Reel/>
-
-        </SwiperSlide>
-        <SwiperSlide className="w-full">
-          <div className="fixed top-0 left-0 w-full h-2">
-            <div className="h-full w-full animated-gradient"></div>
-          </div>
-          <div className="w-screen h-screen flex justify-center">
-            <div className='self-center'>
-              <Image
-                  width={100}  
-                  height={100} 
-                  alt="instagram"
-                  src="/instagram-new-2022-seeklogo.svg"
-              />
-            </div>
-            <h1 class="bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">hello world</h1>
-
-            <p className="text-lg font-semibold self-end">by <span > Eudes</span></p> 
-          </div>
-        </SwiperSlide> */}
+        )}
       </Swiper>
     </div>
   );

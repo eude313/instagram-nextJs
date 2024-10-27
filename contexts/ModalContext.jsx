@@ -1,25 +1,28 @@
+'use client';
+
 import { createContext, useContext, useState } from 'react';
 
 const ModalContext = createContext();
 
 export function ModalProvider({ children }) {
-  const [modals, setModals] = useState({});
+  const [modalState, setModalState] = useState({ isOpen: false, type: null, data: null });
 
-  const openModal = (modalName) => {
-    setModals((prevModals) => ({ ...prevModals, [modalName]: true }));
-    console.log(`Opening ${modalName}`); // Debugging output
+  const openModal = (type, data = {}) => {
+    setModalState({ isOpen: true, type, data });
   };
 
-  const closeModal = (modalName) => {
-    setModals((prevModals) => ({ ...prevModals, [modalName]: false }));
-    console.log(`Closing ${modalName}`); // Debugging output
+  const closeModal = () => {
+    setModalState({ isOpen: false, type: null, data: null });
   };
 
   return (
-    <ModalContext.Provider value={{ modals, openModal, closeModal }}>
+    <ModalContext.Provider value={{ modalState, openModal, closeModal }}>
       {children}
     </ModalContext.Provider>
   );
 }
 
-export const useModal = () => useContext(ModalContext);
+
+export function useModal() {
+  return useContext(ModalContext);
+}

@@ -1,24 +1,26 @@
-
 'use client';
-
-import React, { useState, useEffect, useRef } from 'react';
-import { Avatar, Image, Button } from "@nextui-org/react";
-import { Bookmark, Chat, CheckMark, DotsMenu, Emoji, Heart, Share, Remove, UnLike, Person, Mute, UnMute  } from '@/icons'; 
+import Link from 'next/link';
+import ApiService from '@/lib/ApiService';
+import Carousel from 'react-multi-carousel';
+import EmojiPicker from 'emoji-picker-react';
+import 'react-multi-carousel/lib/styles.css';
+import { AnimatePresence } from 'framer-motion';
 import { useLike } from "@/contexts/LikeContext";
+import HoverContent from '../Hoover/HoverContent';
+import { useModal } from '@/contexts/ModalContext';
 import { usePostModal } from '@/hooks/usePostModal';
 import HoverComponent from '../Hoover/HoverComponent';
-import HoverContent from '../Hoover/HoverContent';
-import EmojiPicker from 'emoji-picker-react';
-import { AnimatePresence } from 'framer-motion';
+import { Avatar, Image, Button } from "@nextui-org/react";
+import React, { useState, useEffect, useRef } from 'react';
 import ScaleUpVertBottom from '@/Animation/ScaleUpVertBottom';
-import ApiService from '@/lib/ApiService';
-// import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
-import { Carousel } from '@nextui-org/react';
+import { Bookmark, Chat, CheckMark, DotsMenu, Emoji, Heart, Share, Remove, UnLike, Person, Mute, UnMute } from '@/icons';
+
+
 
 const Posts = ({ post }) => {
   const postRef = useRef(null);
   const videoRef = useRef(null);
+  const { openModal } = useModal();
   const emojiPickerRef = useRef(null);
   const { likes, toggleLike } = useLike();
   const { openPostModal } = usePostModal();
@@ -75,8 +77,8 @@ const Posts = ({ post }) => {
   const handleDoubleTap = async (itemId) => {
     try {
       if (!likes[itemId]?.isLiked) {
-        await ApiService.likePost(itemId); 
-        toggleLike(itemId); 
+        await ApiService.likePost(itemId);
+        toggleLike(itemId);
         setShowHeart(true);
         setTimeout(() => setShowHeart(false), 1000);
       }
@@ -113,7 +115,7 @@ const Posts = ({ post }) => {
 
   const handleShare = async (postId) => {
     try {
-      const { share_link } = await ApiService.getShareLink(postId); 
+      const { share_link } = await ApiService.getShareLink(postId);
       alert(`Share this link: ${share_link}`);
     } catch (error) {
       console.error('Error getting share link:', error);
@@ -126,7 +128,7 @@ const Posts = ({ post }) => {
       rootMargin: '0px',
       threshold: 0.5,
     };
-  
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (videoRef.current) {
@@ -146,11 +148,11 @@ const Posts = ({ post }) => {
         }
       });
     }, options);
-  
+
     if (postRef.current) {
       observer.observe(postRef.current);
     }
-  
+
     return () => {
       if (postRef.current) {
         observer.unobserve(postRef.current);
@@ -175,8 +177,6 @@ const Posts = ({ post }) => {
     }
   };
 
- 
-  
   useEffect(() => {
     if (post.latest_comment) {
       setLatestComment(post.latest_comment);
@@ -196,7 +196,6 @@ const Posts = ({ post }) => {
     }
   };
 
-
   const handleInputChange = (e) => {
     setComment(e.target.value);
   };
@@ -206,30 +205,30 @@ const Posts = ({ post }) => {
       if (post.media.length === 1) {
         const media = post.media[0];
         return media.media_type === 'image' ? (
-          <Image 
-            alt="Post content" 
-            src={media.media_file} 
-            className="w-full h-auto md:rounded-md" />
+          <Image
+            alt="Post content"
+            src={media.media_file}
+            className="w-full h-auto rounded-none md:rounded-md z-0" />
         ) : (
-          
-          <div className="h-[585px] w-full md:rounded-md relative overflow-hidden">
-            <video  
+
+          <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
+            <video
               loop
               autoPlay
-              playsInline 
+              playsInline
               ref={videoRef}
               muted={isMuted}
               src={media.media_file}
               onClick={handleVideoClick}
               className="absolute top-0 left-0 w-full h-full object-contain" />
-             <Button
+            <Button
               isIconOnly
               aria-label="mute/UnMute"
               onClick={handleMuteToggle}
               className="bg-inherit absolute bottom-2 right-2 z-20 text-white"
             >
               {isMuted ? <Mute /> : <UnMute />}
-            </Button> 
+            </Button>
           </div>
 
         );
@@ -239,16 +238,16 @@ const Posts = ({ post }) => {
             {post.media.map((media, index) => (
               <Carousel.Item key={index}>
                 {media.media_type === 'image' ? (
-                  <Image 
+                  <Image
                     src={media.media_file}
-                    className="w-full h-auto md:rounded-md"  
+                    className="w-full h-auto rounded-none md:rounded-md"
                     alt={`Post content ${index + 1}`} />
                 ) : (
-                  <div className="h-[585px] w-full md:rounded-md relative overflow-hidden">
-                    <video  
+                  <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
+                    <video
                       loop
                       autoPlay
-                      playsInline 
+                      playsInline
                       ref={videoRef}
                       muted={isMuted}
                       src={media.media_file}
@@ -260,10 +259,10 @@ const Posts = ({ post }) => {
                       onClick={handleMuteToggle}
                       className="absolute bottom-2 right-2 z-20 bg-black/50 text-white"
                     >
-                      {isMuted ? <Mute /> : <Unmute />}
+                      {isMuted ? <Mute /> : <UnMute />}
                     </Button>
                   </div>
-                
+
                 )}
               </Carousel.Item>
             ))}
@@ -275,51 +274,53 @@ const Posts = ({ post }) => {
   };
 
   return (
-    <div className='mx-auto'ref={postRef}>
+    <div className='mx-auto' ref={postRef}>
       <div className='flex flex-row py-2 gap-3 px-3 top'>
-        {/* <div className="relative bg-gradient-to-tr from-[#FFC800] to-[#CC00BF] p-[2px] mt-0 bg-default text-default-foreground rounded-full"> */}
         <div className={`relative ${hasStory ? 'bg-gradient-to-tr from-[#FFC800] to-[#CC00BF] p-[2px]' : ''} mt-0 bg-default text-default-foreground rounded-full`}>
-          <a href="#" className="block bg-white dark:bg-black p-[2px] rounded-full">
-            <Avatar
-              width={38}
-              shadow='sm'
-              height={38}
-              radius="full"
-              className="text-sm"
-              alt={post.user.username}
-              src={post.user.profile_picture} 
-            />
-          </a>
+          <Link href={`/accounts/${post.user.username}`}>
+            <div className={`rounded-full ${hasStory ? 'bg-white dark:bg-black p-[2px]' : ''}`}>
+              <Avatar
+                width={38}
+                shadow='sm'
+                height={38}
+                radius="full"
+                className="text-sm"
+                alt={post.user.username}
+                src={post.user.profile_picture}
+              />
+            </div>
+          </Link>
         </div>
         <div className='mr-auto flex items-center'>
           <div>
-            <HoverComponent hoverContent={<HoverContent />}>
+            <HoverComponent hoverContent={<HoverContent post={post} />}>
               <p className='font-semibold text-sm cursor-pointer flex gap-x-1'>
                 <span>
                   {post.user.username}
-                </span> 
+                </span>
                 {(isAdmin || isVerified) && (
                   <span className='mt-1.5'>
-                    <CheckMark  
-                    className={isAdmin ? 'text-green-500' : 'text-blue-500'}
-                    fill={isAdmin ? 'green' : 'blue'}
+                    <CheckMark
+                      className={isAdmin ? 'text-green-500' : 'text-blue-500'}
+                      fill={isAdmin ? 'green' : 'blue'}
                     />
                   </span>
                 )}
               </p>
-            </HoverComponent>
+            </HoverComponent >
             <p className='text-sm font-light'>{post.created_at}</p>
           </div>
         </div>
-        <Button isIconOnly aria-label="menu" className="bg-inherit">
+
+        <Button isIconOnly aria-label="menu" className="bg-inherit" onPress={() => openModal('postMenu', post.id)} >
           <DotsMenu />
         </Button>
       </div>
 
-      <div className="grow relative md:rounded-md md:border border-[#DBDBDB] dark:border-[#262626]"  onClick={(e) => handleTap(e, post.id)}>
+      <div className="grow relative md:rounded-md md:border border-[#DBDBDB] dark:border-[#262626]" onClick={(e) => handleTap(e, post.id)}>
         {renderMedia()}
         <Button isIconOnly aria-label="tag" radius='full' className="absolute bg-inherit bottom-0 left-0 z-20">
-          <Person/>
+          <Person />
         </Button>
         {showHeart && (
           <Button isIconOnly aria-label="like/unlike" className="absolute inset-0 flex items-center justify-center z-20">
@@ -332,23 +333,22 @@ const Posts = ({ post }) => {
         <div className="w-full pt-3 px-[12px] md:px-0">
           <div className="flex flex-row mb-4">
             <Button
-              isIconOnly  
+              isIconOnly
               aria-label="likes"
               className='bg-inherit mr-2 dark:text-white text-black'
-              onPress={() => handleDoubleTap(post.id)} 
+              onPress={() => handleDoubleTap(post.id)}
             >
-              {likes[post.id]?.isLiked ? <UnLike />:  <Heart />}
+              {likes[post.id]?.isLiked ? <UnLike /> : <Heart />}
             </Button>
-            <Button isIconOnly aria-label="comment" className="bg-inherit mr-2" 
-            onPress={() => openPostModal(post.id)}>
+            <Button isIconOnly aria-label="comment" className="bg-inherit mr-2" onPress={() => openPostModal(post.id)}>
               <Chat />
             </Button>
-            <Button isIconOnly aria-label="share" className="bg-inherit" 
-            onPress={() => handleShare(post.id)}>
+            <Button isIconOnly aria-label="share" className="bg-inherit"
+              onPress={() => handleShare(post.id)}>
               <Share />
             </Button>
-            <Button isIconOnly aria-label="save" className="ml-auto bg-inherit" 
-            onPress={() => handleSave(post.id)}>
+            <Button isIconOnly aria-label="save" className="ml-auto bg-inherit"
+              onPress={() => handleSave(post.id)}>
               {savedPosts[post.id] ? <Bookmark /> : <Remove />}
             </Button>
           </div>
@@ -383,13 +383,14 @@ const Posts = ({ post }) => {
               Post
             </button>
             <Button isIconOnly aria-label="emoji" onClick={toggleEmojiPicker} className={`bg-inherit mt-2 mr-[12px] md:mr-0 cursor-pointer ${!comment ? 'block' : 'hidden'}`}>
-              <Emoji />
+              <Emoji height='16' width='16' />
             </Button>
             <AnimatePresence>
               {isOpen && (
                 <ScaleUpVertBottom isVisible={isOpen}>
-                  <div className="bg-white dark:bg-black border-t border-t-[#262626] p-4 shadow-lg z-30 absolute bottom-[38px] right-0 left-0 w-full" ref={emojiPickerRef}>
-                    <EmojiPicker 
+                  <div className="bg-white dark:bg-black border-t border-t-[#262626] 
+                  p-4 shadow-lg z-30 absolute bottom-[38px] right-0 left-0 w-full" ref={emojiPickerRef}>
+                    <EmojiPicker
                       className="w-full bg-inherit border-none rounded-none"
                       theme="auto"
                       onEmojiClick={handleEmojiSelect}

@@ -297,7 +297,7 @@ export default function EditPage() {
                                 </p>
                                 <div>
                                     <Button 
-                                        onClick={handleButtonClick}
+                                        onPress={handleButtonClick}
                                         className="cursor-pointer bg-inherit font-semibold text-[#1877F2] hover:text-black 
                                         dark:hover:text-white"
                                     >
@@ -402,3 +402,493 @@ export default function EditPage() {
 
   <button aria-label="Toggle audio" class=" _acan _acao _acas _aj1- _ap30" type="button"><div class="x9f619 x78zum5 x14yjl9h xudhj91 x18nykt9 xww2gxu x1yztbdb xktsk01 x1y1aw1k x1sxyh0 xwib8y2 xurb0ha x1uhb9sk x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh x1nhvcw1 x1wunsqr"><svg aria-label="Audio is muted" class="x1lliihq x1n2onr6 x9bdzbf" fill="currentColor" height="12" role="img" viewBox="0 0 48 48" width="12"><title>Audio is muted</title><path clip-rule="evenodd" d="M1.5 13.3c-.8 0-1.5.7-1.5 1.5v18.4c0 .8.7 1.5 1.5 1.5h8.7l12.9 12.9c.9.9 2.5.3 2.5-1v-9.8c0-.4-.2-.8-.4-1.1l-22-22c-.3-.3-.7-.4-1.1-.4h-.6zm46.8 31.4-5.5-5.5C44.9 36.6 48 31.4 48 24c0-11.4-7.2-17.4-7.2-17.4-.6-.6-1.6-.6-2.2 0L37.2 8c-.6.6-.6 1.6 0 2.2 0 0 5.7 5 5.7 13.8 0 5.4-2.1 9.3-3.8 11.6L35.5 32c1.1-1.7 2.3-4.4 2.3-8 0-6.8-4.1-10.3-4.1-10.3-.6-.6-1.6-.6-2.2 0l-1.4 1.4c-.6.6-.6 1.6 0 2.2 0 0 2.6 2 2.6 6.7 0 1.8-.4 3.2-.9 4.3L25.5 22V1.4c0-1.3-1.6-1.9-2.5-1L13.5 10 3.3-.3c-.6-.6-1.5-.6-2.1 0L-.2 1.1c-.6.6-.6 1.5 0 2.1L4 7.6l26.8 26.8 13.9 13.9c.6.6 1.5.6 2.1 0l1.4-1.4c.7-.6.7-1.6.1-2.2z" fill-rule="evenodd"></path></svg></div></button>
 
+ikigai => what you love 
+          what you are good at
+          what the world needs
+          what you can get paid for
+
+
+
+// 'use client';
+
+// import React from 'react'
+// import { useRouter, useParams} from 'next/navigation';
+// import { Avatar } from '@nextui-org/react';
+// import {Phone, Video, Info, Emoji, Heart, Image, Mic} from '@/icons'; 
+// import EmojiPicker from 'emoji-picker-react';
+// import { AnimatePresence } from 'framer-motion';
+// import ScaleUpVertBottom from '@/Animation/ScaleUpVertBottom';
+// import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@nextui-org/react";
+
+
+// export default function ChatPage() {
+//   const { chatId } = useParams();
+//   const router = useRouter();
+//   const { name, username, src, alt } = router.query || {};
+  
+//   const [message, setMessage] = React.useState("");
+//   const [isOpen, setIsOpen] = React.useState(false);
+//   const emojiPickerRef = React.useRef(null);
+
+//   const handleInputChange = (e) => {
+//     setMessage(e.target.value);
+//   };
+  
+//   const toggleEmojiPicker = () => {
+//     setIsOpen(!isOpen); 
+//   };
+
+//   const handleEmojiSelect = (emojiObject) => {
+//     setMessage(prevMessage => prevMessage + emojiObject.emoji);
+//   };
+
+
+//   const handleClickOutside = (event) => {
+//     if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+//       setIsOpen(false);
+//     }
+//   };
+
+//   React.useEffect(() => {
+//     document.addEventListener('mousedown', handleClickOutside);
+//     return () => {
+//       document.removeEventListener('mousedown', handleClickOutside);
+//     };
+//   }, []);
+
+//   return (
+//     <div class="flex flex-col h-screen">
+//       <div class="flex justify-between border-b w-full border-[#DBDBDB] 
+//         dark:border-[#262626] py-3 px-[12px] grow-0">
+//         <div className="flex">
+//           <Avatar alt={alt} size="lg" className="flex-shrink-0" src={src}/>
+//           <div className="flex flex-col ml-2">
+//             <span className="text-small">{name}</span>
+//             <span className="text-tiny text-default-400">online</span>
+//           </div>
+//         </div>
+
+//         <div class="p-2 flex justify-around">
+//           <span className="mr-2">
+//             <Phone/>
+//           </span>
+//           <span className="mr-2">
+//             <Video/>
+//           </span>
+//           <Dropdown>
+//             <DropdownTrigger>
+//               <Info/>
+//             </DropdownTrigger>
+//             <DropdownMenu variant="faded" aria-label="Dropdown menu with icons">
+//               <DropdownItem
+//                 key="copy"
+//                 shortcut="⌘C"
+//                 startContent='the'
+//               >
+//                 Copy link
+//               </DropdownItem>
+//             </DropdownMenu>
+//           </Dropdown>
+//         </div>
+//       </div>
+//       <div className="w-full p-[12px] overflow-y-auto grow h-fit">
+//         <div className="w-full flex justify-center my-4">
+//           <div>
+//             <Avatar src={src} alt={alt}  className="w-20 h-20 text-large" />
+//             <div className="flex flex-col text-center mb-2">
+//               <span className="text-small">{name}</span>
+//               <span className="text-tiny text-default-400">{username}</span>
+//             </div>
+//             <Button size="sm">
+//               View profile
+//             </Button>
+//           </div> 
+//         </div>
+//         <div className='flex flex-col-reverse'>
+//           <div className='flex flex-row gap-2' id='recieved chats'>
+//             <Avatar alt='alt' size="sm" className="flex-shrink-0" src='/user.png'/>
+//             <div className='rounded-full bg-[#262626] text-white w-auto'>
+//               <p className="text-small m-1 mx-2 text-left">dksjdksdbnncbnsid</p>
+//             </div>
+//           </div>
+//           <div className="m-1 flex justify-end"  id='sent chats'>
+//             <div className='rounded-full bg-[#3797F0] text-white flex flex-row gap-2 
+//             w-auto'>
+//               <p className="text-small m-1 mx-2 text-right">adcsabdcsadiad</p>
+//             </div>
+//           </div> 
+//         </div>
+//       </div>
+//       <div class="px-[12px] py-2 ">
+//         <div class="flex border w-full border-[#DBDBDB] grow-0
+//           dark:border-[#262626] p-[5px] flex-row relative rounded-full">
+//           <span onClick={toggleEmojiPicker} className="mt-2 ml-2 cursor-pointer">
+//             <Emoji />
+//           </span>
+//           <AnimatePresence>
+//             {isOpen && (
+//               <ScaleUpVertBottom isVisible={isOpen}>
+//                 <div className="bg-white dark:bg-black 
+//                 p-4 shadow-lg z-30 absolute bottom-[38px] right-0 left-0 w-full" ref={emojiPickerRef}>
+//                   <EmojiPicker 
+//                     className="bg-inherit border-none"
+//                     theme="auto"
+//                     onEmojiClick={handleEmojiSelect}
+//                   />
+//                 </div>
+//               </ScaleUpVertBottom>
+//             )} 
+//           </AnimatePresence>
+//           <input
+//             type="text"
+//             placeholder="Send Message..."
+//             value={message}
+//             onChange={handleInputChange}
+//             className="mx-2 bg-inherit grow h-8 mt-1 border-none outline-none "
+//           />
+//           <div
+//             className={`cursor-pointer flex mt-2 ${!message ? 'block' : 'hidden'}`}>
+//             <span className="mr-2">
+//               <Mic/>
+//             </span>
+//             <span className="mr-2">
+//               <Image/>
+//             </span>
+//             <span className="mr-2">
+//               <Heart/>
+//             </span>
+//           </div>
+//           <h2
+//             type='submit'
+//             className={`mt-2 mr-2 cursor-pointer font-semibold text-[#1877F2] ${!message ? 
+//               'hidden' : 'block'}`}
+//           >
+//             Send
+//           </h2>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+          {/* <Dropdown
+            placement={isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage || isScreenSmall ? "right" : "top-end"}
+            classNames={{
+              content: "p-[0px] m-[0px] dark:bg-[#262626] ",
+            }}
+          >
+            <DropdownTrigger>
+              <div className={linkItems}>
+                {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage || isScreenSmall ? (
+                  <Menu className="md:mr-0" />
+                ) : (
+                  <div className="flex">
+                    <Menu className="md:mr-0" />
+                    <span className="ml-2 xl:ml-4">More</span>
+                  </div>
+                )}
+              </div>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" className="w-[266px] h-max-[405px] 
+            p-[0px] m-[0px] rounded-md">
+              <DropdownSection aria-label="settings" className="px-2 pt-1">
+                <DropdownItem
+                  key="settings"
+                  href="/accounts/settings"
+                  className={menuStyles}>
+                  <div className="flex">
+                    <Setting className="md:mr-0" />
+                    <span className="ml-2 xl:ml-4">Settings</span>
+                  </div>
+                </DropdownItem>
+                <DropdownItem
+                  key="activity"
+                  href="/accounts/activity"
+                  className={menuStyles}>
+                  <div className="flex">
+                    <Activity className="md:mr-0" />
+                    <span className="ml-2 xl:ml-4">Your activity</span>
+                  </div>
+                </DropdownItem>
+                <DropdownItem key="saved" className={menuStyles}>
+                  <div className="flex">
+                    <Bookmark className="md:mr-0" />
+                    <span className="ml-2 xl:ml-4">Saved</span>
+                  </div>
+                </DropdownItem>
+                <DropdownItem key="report" className={menuStyles}>
+                  <div className="flex">
+                    <MessageWarning className="md:mr-0" />
+                    <span className="ml-2 xl:ml-4">Report a problem</span>
+                  </div>
+                </DropdownItem>
+              </DropdownSection>
+              <DropdownSection aria-label="Preferences" className="hide-on-large-height border-y-3 dark:border-y-[#3F3F46] border-y-[#dcdcdc] py-2 px-2 mx-[0px]">
+                <DropdownItem key="threads" className={`py-3 ${menuStyles}`}>
+                  <div className="flex">
+                    <Threads className="md:mr-0" />
+                    <span className="ml-2 xl:ml-4">Threads</span>
+                  </div>
+                </DropdownItem>
+              </DropdownSection>
+              <DropdownSection aria-label="Profile & Actions" className='hide-on-small-height border-t-1 border-t-[#3F3F46]'></DropdownSection>
+              <DropdownSection aria-label="switch" className="px-2 mx-[0px]">
+                <DropdownItem
+                  isReadOnly
+                  key="theme"
+                  className={`cursor-default ${menuStyles}`}
+                  endContent={
+                    <ThemeSwitch />
+                  }
+                >
+                  Switch appearance
+                </DropdownItem>
+                <DropdownItem key="switch_accounts" className={`mb-[0px]  ${menuStyles}`} onPress={() => { openModal('authModal') }}>
+                  Switch accounts
+                </DropdownItem>
+              </DropdownSection>
+              <DropdownSection aria-label="switch" className="" showDivider>
+              </DropdownSection>
+              <DropdownSection aria-label="logs" className="px-2 mb-0 pb-1">
+                <DropdownItem key="logout" className={`mb-[0px]  ${menuStyles}`} onClick={handleLogout}>
+                  Log Out
+                </DropdownItem>
+              </DropdownSection>
+            </DropdownMenu>
+          </Dropdown> */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'use client';
+
+import Link from "next/link";
+import { Instagram } from "@/icons";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button, Input, Card, CardBody, CardHeader, Image, Divider } from "@nextui-org/react";
+import ApiService from "@/lib/ApiService"; 
+
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
+  const [errorMessage, setErrorMessage] = useState(""); 
+
+ 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true); 
+    try {
+      const response = await axiosInstance.post("api/auth/login/", {
+        email,
+        password,
+      });
+  
+      if (response.status === 200) {
+        const { access, refresh } = response.data; 
+        localStorage.setItem("access_token", access);  
+        localStorage.setItem("refresh_token", refresh);
+        
+        router.push("/"); 
+      } else {
+        setErrorMessage("Login failed");
+      }
+    } catch (error) {
+      setErrorMessage(error.response ? error.response.data.detail : "Login error. Please try again."); 
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 5000); 
+
+      return () => clearTimeout(timer); 
+    }
+  }, [errorMessage]);
+
+  return (
+    <div className="w-screen h-screen flex justify-center align-center">
+      <div className="flex flex-row lg:gap-4 my-auto">
+        <Image
+          className="min-w-full rounded-none hidden xl:block"
+          src="/Instagram.png"
+          alt="cute kitty"
+        />
+        <div className="flex flex-col my-auto">
+          <Card className="shadow-none md:border border-[#DBDBDB] dark:border-[#262626] w-full md:w-[340px] rounded-none text-center px-4 md:px-8">
+            <CardHeader className="flex justify-center pt-8">
+              <Instagram width="170" height='50' className='mb-5'/>
+            </CardHeader>
+            <CardBody className="px-4">
+              {errorMessage && (
+                <div className="bg-red-500 text-white mb-1.5 text-center py-2">
+                  <p>{errorMessage}</p>
+                </div>
+              )}
+              <form onSubmit={handleLogin} className="space-y-4 mb-3">
+                <Input
+                  required 
+                  size="sm"
+                  type="email"
+                  label="Email"
+                  value={email}
+                  radius="none"
+                  onChange={(e) => setEmail(e.target.value)}
+                  classNames={{
+                    label: "text-black/50 dark:text-white/90",
+                    input: [
+                      "bg-transparent",
+                      "text-black/90 dark:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "group-data-[focus=true]:bg-[#FAFAFA]",
+                      "dark:group-data-[focus=true]:bg-default/30",
+                      "!cursor-text",
+                      "border border-[#DBDBDB] dark:border-[#262626]",
+                    ],
+                  }}
+                />
+                <Input
+                  size="sm"
+                  radius="none"
+                  type={isVisible ? "text" : "password"}
+                  label="Password"
+                  value={password}
+                  endContent={
+                    <h2 className="text-sm font-semibold my-auto text-[#1c2b33] dark:text-[#4CB5F9] cursor-pointer" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
+                      {isVisible ? 'Hide': 'Show' }
+                    </h2>
+                  }
+                  classNames={{
+                    label: "text-black/50 dark:text-white/90",
+                    input: [
+                      "bg-transparent",
+                      "text-black/90 dark:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "group-data-[focus=true]:bg-default/30",
+                      "dark:group-data-[focus=true]:bg-default/60",
+                      "!cursor-text",
+                      "border border-[#DBDBDB] dark:border-[#262626]",
+                    ],
+                  }}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button fullWidth type="submit" className="bg-[#4CB5F9] text-white" isLoading={isLoading}>
+                  Login
+                </Button>
+              </form>
+              <div className="flex items-center justify-center mb-4">
+                <div className="flex h-5 items-center text-small ">
+                  <Divider className="w-[100px]"/>
+                  <div className='mx-[18px]'>OR</div>
+                  <Divider className="w-[100px]"/>
+                </div>
+              </div>
+              <div className="text-[#1c2b33] dark:text-[#4CB5F9] text-center flex flex-col gap-y-4 ">
+                <Link className="mb-2 font-semibold" href="#" >
+                  Log in with facebook
+                </Link>
+                <Link href="/auth/password-reset" className="mb-2 text-sm">
+                  Forgot password?
+                </Link> 
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card className="shadow-none md:border border-[#DBDBDB] dark:border-[#262626]
+           h-[60px] w-[340px] rounded-none text-center mt-0 md:mt-4">
+            <CardBody>
+              <div className="text-center my-auto">
+                <p className='text-sm'>Dont have an account?
+                  <Link href='/auth/register'
+                    className="ml-2 text-[#4CB5F9] font-semibold">Sign up
+                  </Link>
+                </p>
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card className="shadow-none rounded-none w-[340px] mt-0 md:mt-2 px-2">
+            <CardBody>
+              <div className="text-center pb-1 mt-0 md:mb-2">
+                <small className="text-sm">Get the app.</small>
+              </div>
+              <Link href='#'>
+                <Image
+                  className="rounded-none"
+                  src="/play.png"
+                  alt="cute kitty"
+                />
+              </Link>
+            </CardBody>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

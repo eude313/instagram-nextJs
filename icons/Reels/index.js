@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Reels() {
   return (
-    <svg ariaLabel="Reels" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+    <svg aria-label="Reels" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
         <title>Reels</title>
         <line fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth="2" x1="2.049" x2="21.95" y1="7.002" y2="7.002"></line>
         <line fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="13.504" x2="16.362" y1="2.001" y2="7.002"></line>

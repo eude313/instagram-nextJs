@@ -19,7 +19,7 @@ const ProgressBar = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (!isVisible) return null; 
+  if (!isVisible) return null;
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white dark:bg-black h-2 z-50">
@@ -27,9 +27,10 @@ const ProgressBar = () => {
         className="h-full rounded-full transition-all duration-500"
         style={{
           width: `${progress}%`,
-          background: 'bg-gradient-to-r from-purple-700 to-yellow-400 via-pink-500',
+          background: 'linear-gradient(to right, #6B46C1, #FBBF24, #EC4899)', 
+          // background: 'bg-gradient-to-r from-purple-700 to-yellow-400 via-pink-500',
         }}
-      ></div>
+      />
     </div>
   );
 };

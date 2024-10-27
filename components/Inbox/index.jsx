@@ -27,17 +27,19 @@ export default function Inbox() {
         >
           <Back/>
         </Button>
-        <Button className="text-medium bg-inherit mt-1" endContent={
-          <span className="rotate-180">
-            <Back width="15" height='15'/>
-          </span>
-        }>
+        <Button 
+          className="text-medium bg-inherit mt-1" 
+          onPress={() => {openModal('authModal')}}
+          endContent={
+            <span className="rotate-180">
+              <Back width="15" height='15'/>
+            </span>
+          }
+        >
           Username
         </Button>
-        <Button isIconOnly  className="bg-inherit" aria-label="start chat" onPress={() => {
-          console.log('Opening Search Modal');
-          openModal('searchModal');
-        }}>
+        <Button isIconOnly  className="bg-inherit" aria-label="start chat" 
+        onPress={() => {openModal('searchModal')}}>
           <Message/>
         </Button> 
       </div>

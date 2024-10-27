@@ -23,7 +23,7 @@ export default function Page() {
           <p className="text-base text-[#c4c0bc]">Send a message to start a chat</p>
         </div>
         <div className="px-auto py-3">
-          <Button className="bg-[#1877F2]" onPress={() => openModal('searchModal')}>
+          <Button className="bg-[#1877F2]" onPress={() => {openModal('searchModal')}}>
             Send Message 
           </Button>
         </div>

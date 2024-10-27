@@ -2,20 +2,22 @@
 
 import Link from 'next/link';
 import ApiService from '@/lib/ApiService';
-import { ThemeSwitch } from '../ThemeSwitch';
-import axiosInstance from "@/lib/axiosInstance"; 
+import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
+import { useModal } from "@/contexts/ModalContext";
 import ScaleUpHorLeft from '@/Animation/ScaleUpHorLeft';
-import React, { useState,useEffect, useRef  } from 'react';
-import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip, Button,  User, DropdownSection, ScrollShadow, } from "@nextui-org/react";
-import { Messenger, Create, Explore, Heart, Home, Reels, Search, Menu, Threads, Insta, Instagram, Setting, Bookmark, MessageWarning, Activity,VideoPic,Live } from '@/icons';
+import NestedDropdown from "@/components/NestedDropdown";
+import React, { useState, useEffect, useRef } from 'react';
+import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip, Button, User, ScrollShadow, } from "@nextui-org/react";
+import { Messenger, Create, Explore, Heart, Home, Reels, Search, Menu, Threads, Insta, Instagram, Setting, Bookmark, MessageWarning, Activity, VideoPic, Live } from '@/icons';
 
+import { IoMoon } from "react-icons/io5";
 
-const linkItems = `flex items-center justify-center md:justify-start py-3 px-4 hover:bg-[#F2F2F2] rounded-lg transition-colors duration-300 font-light  active:font-bold dark:text-gray-300 dark:hover:bg-[#1A1A1A] dark:hover:text-white rounded-md transition-colors duration-300`;
+const linkItems = `flex items-center justify-center md:justify-start py-3 px-4 hover:bg-[#F2F2F2] transition-colors duration-300 font-light  active:font-bold dark:text-gray-300 dark:hover:bg-[#1A1A1A] dark:hover:text-white rounded-md`;
 
 const sidebarStyles = `fixed top-0 left-0 w-[390px] h-screen bg-inherit bg-white dark:bg-black border-r border-r-[#262626] shadow-lg rounded-r-lg transition-transform duration-300 z-30`
 
-const menuStyles = `py-3 my-1` 
+const menuStyles = `py-3 my-1`
 
 export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSmall }) {
   const [isSearchSidebarOpen, setSearchSidebarOpen] = useState(false);
@@ -23,9 +25,12 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
   const searchSidebarRef = useRef(null);
   const notificationsSidebarRef = useRef(null);
   const [user, setUser] = useState(null);
+  const { openModal } = useModal();
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
 
   const handleSearchClick = () => {
@@ -52,31 +57,13 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
     }
   };
 
-  // const handleLogout = async () => {
-  //   try {
-  //     const response = await axiosInstance.post('api/auth/logout/'); 
-  //     if (response.status === 205) {
-  //       router.push("/auth/login");
-  //       console.log('Logged out successfully');
-  //     } else {
-  //       console.error('Logout failed:', response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error('Logout error:', error);
-  //   }
-  // };
-
   const handleLogout = async () => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');  
-      if (!refreshToken) {    
-        throw new Error('No refresh token found');  }  
-        const response = await axiosInstance.post('api/auth/logout/', { 
-          refresh_token: refreshToken 
-        });  
-        localStorage.removeItem('access_token');  localStorage.removeItem('refresh_token');  return response.data;
+      await ApiService.logoutUser();
+      router.push('/auth/login');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Logout failed:', error);
+      router.push('/auth/login');
     }
   };
 
@@ -116,6 +103,55 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
     } else {
       setSearchResults([]);
     }
+  };
+
+  // Dropdown 1 with Theme Switch and Custom Styles
+  const menuItemsWithTheme = [
+    {
+      key: "settings",
+      label: "Settings",
+      href: "/accounts/settings",
+      icon: <Setting className="w-5 h-5" />
+    },
+    {
+      key: "activity",
+      label: "Your activity",
+      href: "/accounts/activity",
+      icon: <Activity className="w-5 h-5" />
+    },
+    {
+      key: "saved",
+      label: "Saved",
+      icon: <Bookmark className="w-5 h-5" />
+    },
+    {
+      key: "report-problem",
+      label: "Report a problem",
+      icon: <MessageWarning className="w-5 h-5" />
+    },
+    {
+      key: "theme",
+      label: "Switch Theme",
+      hasSubmenu: true,
+      icon: <IoMoon className="w-5 h-5" />,
+      children: [{
+        key: "themeToggle",
+        type: "toggle",
+        label: "Dark Mode",
+        icon: <IoMoon className="w-5 h-5" />
+      }],
+    },
+    {
+      key: "threads",
+      label: "Threads",
+      icon: <Threads className="w-5 h-5" />
+    },
+    { key: "switch-account", label: "Switch account", onClick: () => openModal('authModal') },
+    { key: "logout", label: "Logout", onClick: handleLogout },
+  ];
+
+  const handleThemeToggle = () => {
+    setIsDarkMode(!isDarkMode);
   };
   return (
     <div className='h-screen flex'>
@@ -212,11 +248,11 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
               )}
             </button>
           </Tooltip>
-          <Dropdown 
-          placement={isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage || isScreenSmall ? "right" : "bottom-end"}
-          classNames={{
-            content: "dark:bg-[#262626] m-2",
-          }}
+          <Dropdown
+            placement={isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage || isScreenSmall ? "right" : "bottom-end"}
+            classNames={{
+              content: "dark:bg-[#262626] m-2",
+            }}
           >
             <DropdownTrigger>
               <div className={linkItems}>
@@ -232,41 +268,32 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
               </div>
             </DropdownTrigger>
             <DropdownMenu aria-label="Profile Actions" className="w-[266px] px-[4px] h-max-[405px] py-2">
-              <DropdownItem key="post" 
-              className={linkItems}>
-                <div className="flex justify-between">  
-                  <span className="text-base">
-                    Post
-                  </span>
-                  <VideoPic className="mx-1" />
-                </div>
+              <DropdownItem key="post" onPress={() => { openModal('createPostModal') }}
+                className={linkItems} endContent={<VideoPic className="mx-1" />}>
+                Post
               </DropdownItem>
-              <DropdownItem key="live" className={linkItems}>
-                <div className="flex justify-between">  
-                    <span className="text-base">
-                      Live video
-                    </span>
-                    <Live className="mx-1" />
-                  </div>
+              <DropdownItem key="live" className={linkItems} endContent={<Live className="mx-1" />}>
+                Live video
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
+
           <Tooltip showArrow={true} content="Profile" placement="right">
             <Link href="/accounts" className={linkItems}>
               {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage
                 || isScreenSmall ? (
-                <Avatar src={user.profile_picture || `/api/placeholder/150/150?text=${user.username[0]}`} 
-                alt={user.username} className="w-6 h-6 text-tiny md:mr-0" />
+                <Avatar src={user.profile_picture || `/api/placeholder/150/150?text=${user.username[0]}`}
+                  alt={user.username} className="w-6 h-6 text-tiny md:mr-0" />
               ) : (
                 <div className="flex">
-                  <Avatar  src={user.profile_picture || `/api/placeholder/150/150?text=${user.username[0]}`} alt={user.username} className="w-6 h-6 text-tiny md:mr-0" />
+                  <Avatar src={user.profile_picture || `/api/placeholder/150/150?text=${user.username[0]}`} alt={user.username} className="w-6 h-6 text-tiny md:mr-0" />
                   <span className="ml-2 xl:ml-4">Profile</span>
                 </div>
               )}
             </Link>
           </Tooltip>
         </div>
-        
+
         <div className="mt-auto mb-4">
           <Tooltip showArrow={true} content="Threads" placement="right">
             <Link href="#" className={`hide-on-small-height ${linkItems}`}>
@@ -281,85 +308,32 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
               )}
             </Link>
           </Tooltip>
-          <Dropdown 
-          placement={isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage || isScreenSmall ? "right" : "top-end"}
-          classNames={{
-            content: "p-[0px] m-[0px] dark:bg-[#262626] ",
-          }}
-          >
-            <DropdownTrigger>
+          {/* Dropdown 1 with Theme Switch and Custom Styles */}
+          <NestedDropdown
+            menuItems={menuItemsWithTheme}
+            className="-z-50"
+            isScreenSmall={isScreenSmall}
+            isMessagesPage={isMessagesPage}
+            isSearchSidebarOpen={isSearchSidebarOpen}
+            isNotificationsSidebarOpen={isNotificationsSidebarOpen}
+            isDarkMode={isDarkMode}
+            isThemeDropdown={true}
+            onThemeToggle={handleThemeToggle}
+            triggerButtonContent={
               <div className={linkItems}>
-                  {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage || isScreenSmall ? (
+                {isSearchSidebarOpen || isNotificationsSidebarOpen || isMessagesPage || isScreenSmall ? (
+                  <Menu className="md:mr-0" />
+                ) : (
+                  <div className="flex">
                     <Menu className="md:mr-0" />
-                  ) : (
-                    <div className="flex">
-                      <Menu className="md:mr-0" />
-                      <span className="ml-2 xl:ml-4">More</span>
-                    </div>
-                  )}
+                    <span className="ml-2 xl:ml-4">More</span>
+                  </div>
+                )}
               </div>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" className="w-[266px] h-max-[405px] 
-            p-[0px] m-[0px] rounded-md">
-              <DropdownSection aria-label="settings" className="px-2 pt-1">
-                <DropdownItem key="settings" className={menuStyles}>
-                  <div className="flex">
-                    <Setting className="md:mr-0" />
-                    <span className="ml-2 xl:ml-4">Settings</span>
-                  </div>
-                </DropdownItem>
-                <DropdownItem key="activity" className={menuStyles}>
-                  <div className="flex">
-                    <Activity className="md:mr-0" />
-                    <span className="ml-2 xl:ml-4">Your activity</span>
-                  </div>
-                </DropdownItem>
-                <DropdownItem key="saved" className={menuStyles}>
-                  <div className="flex">
-                    <Bookmark className="md:mr-0" />
-                    <span className="ml-2 xl:ml-4">Saved</span>
-                  </div>
-                </DropdownItem>
-                <DropdownItem key="report" className={menuStyles}>
-                  <div className="flex">
-                    <MessageWarning className="md:mr-0" />
-                    <span className="ml-2 xl:ml-4">Report a problem</span>
-                  </div>
-                </DropdownItem> 
-              </DropdownSection>
-              <DropdownSection aria-label="Preferences" className="hide-on-large-height border-y-3 dark:border-y-[#3F3F46] border-y-[#dcdcdc] py-2 px-2 mx-[0px]">
-                <DropdownItem key="threads" className={`py-3 ${menuStyles}`}>
-                  <div className="flex">
-                    <Threads className="md:mr-0" />
-                    <span className="ml-2 xl:ml-4">Threads</span>
-                  </div>
-                </DropdownItem>
-              </DropdownSection>
-              <DropdownSection aria-label="Profile & Actions" className='hide-on-small-height border-t-1 border-t-[#3F3F46]'></DropdownSection>
-              <DropdownSection aria-label="switch" className="px-2 mx-[0px]">
-                <DropdownItem
-                  isReadOnly
-                  key="theme"
-                  className={`cursor-default ${menuStyles}`}
-                  endContent={
-                    <ThemeSwitch />
-                  }
-                >
-                  Switch appearance
-                </DropdownItem>
-                <DropdownItem key="switch_accounts" className={`mb-[0px]  ${menuStyles}`}>
-                  Switch accounts
-                </DropdownItem>
-              </DropdownSection>   
-              <DropdownSection aria-label="switch" className="" showDivider>
-              </DropdownSection> 
-              <DropdownSection aria-label="logs" className="px-2 mb-0 pb-1">
-                <DropdownItem key="logout"  className={`mb-[0px]  ${menuStyles}`} onClick={handleLogout}>
-                  Log Out
-                </DropdownItem>
-              </DropdownSection>
-            </DropdownMenu>
-          </Dropdown>
+
+            }
+            triggerButtonStyle="hover:bg-[#F2F2F2] rounded-md dark:hover:bg-[#1A1A1A] w-full dark:hover:text-white font-light active:font-bold dark:text-gray-300"
+          />
         </div>
       </div>
 
@@ -372,16 +346,16 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
               <div className='pb-[12px] pt-[36px] spacing'>
                 <h1 className='font-bold text-2xl'>Search</h1>
               </div>
-              <Input 
-                type="search" 
+              <Input
+                type="search"
                 isClearable
-                className='pb-[4px] pt-[20px]' 
-                placeholder="Search" 
+                className='pb-[4px] pt-[20px]'
+                placeholder="Search"
                 value={searchQuery}
                 onChange={handleSearch}
                 startContent={
                   <Search className="text-lg text-default-400 pointer-events-none flex-shrink-0" />
-                } 
+                }
               />
             </div>
             <hr className="my-4 border-[1px] border-[#262626]" />
@@ -404,12 +378,12 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
       {/* Notifications Sidebar */}
       <AnimatePresence>
         <ScaleUpHorLeft>
-          <div ref={notificationsSidebarRef} className={`${sidebarStyles} ${isNotificationsSidebarOpen ? 'translate-x-[70px]' : '-translate-x-full'} z-0}`}>
+          <div ref={notificationsSidebarRef} className={`${sidebarStyles} ${isNotificationsSidebarOpen ? 'translate-x-[70px]' : '-translate-x-full'} z-50}`}>
             {/* <button onClick={handleNotificationsClick} className="p-4">
               Close
               </button> */}
 
-              <div className="px-[24px]">
+            <div className="px-[24px]">
               <div className='pb-[12px] pt-[36px] spacing'>
                 <h1 className='font-bold text-2xl'>Notifications</h1>
               </div>
@@ -426,16 +400,16 @@ export default function Sidebar({ isMessagesPage, setIsMessagesPage, isScreenSma
                   </Button>
                 </div>
                 <User
-                name="Junior Garcia"
-                description="@jrgarciadev"
-                classNames={{
-                  name: "text-default-600",
+                  name="Junior Garcia"
+                  description="@jrgarciadev"
+                  classNames={{
+                    name: "text-default-600",
                     description: "text-default-500",
                   }}
                   avatarProps={{
                     size: "sm",
                     src: "https://avatars.githubusercontent.com/u/30373425?v=4",
-                  
+
                   }}
                 />
               </div>

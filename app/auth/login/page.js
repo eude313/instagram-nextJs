@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -5,7 +6,7 @@ import { Instagram } from "@/icons";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, Card, CardBody, CardHeader, Image, Divider } from "@nextui-org/react";
-import axiosInstance from "@/lib/axiosInstance"; 
+import ApiService from '@/lib/ApiService'; 
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,24 +19,23 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsLoading(true); 
+    setIsLoading(true);
     try {
-      const response = await axiosInstance.post("api/auth/login/", {
+      const credentials = {
         email,
         password,
-      });
-  
-      if (response.status === 200) {
-        const { access, refresh } = response.data; 
-        localStorage.setItem("access_token", access);  
-        localStorage.setItem("refresh_token", refresh);
-        
-        router.push("/"); 
-      } else {
-        setErrorMessage("Login failed");
-      }
+      };
+      
+      await ApiService.loginUser(credentials);
+      router.push("/");
     } catch (error) {
-      setErrorMessage(error.response ? error.response.data.detail : "Login error. Please try again."); 
+      setErrorMessage(
+        error.detail || 
+        (typeof error === 'object' && error !== null ? 
+          Object.values(error).flat().join(" ") : 
+          "Login error. Please try again."
+        )
+      );
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +53,7 @@ export default function LoginPage() {
 
   return (
     <div className="w-screen h-screen  flex justify-center align-center">
-      <div className="flex flex-row gap-4 my-auto">
+      <div className="flex flex-row lg:gap-4 my-auto">
         <Image
           className="min-w-full rounded-none hidden xl:block"
           src="/Instagram.png"
@@ -144,10 +144,12 @@ export default function LoginPage() {
             </CardBody>
           </Card>
 
-          <Card className="shadow-none md:border border-[#DBDBDB] dark:border-[#262626] h-[60px] w-[340px] rounded-none text-center mt-4">
+          <Card className="shadow-none md:border border-[#DBDBDB] dark:border-[#262626]
+          h-[60px] w-[340px] rounded-none text-center mt-0 md:mt-4">
             <CardBody>
               <div className="text-center my-auto">
-                <p className='text-sm'>Don't have an account?
+                <p className='text-sm'> 
+                 <span> Dont have an account?</span>
                   <Link href='/auth/register'
                     className="ml-2 text-[#4CB5F9] font-semibold">Sign up
                   </Link>
@@ -156,9 +158,9 @@ export default function LoginPage() {
             </CardBody>
           </Card>
 
-          <Card className="shadow-none rounded-none w-[340px] mt-2 px-2">
+          <Card className="shadow-none rounded-none w-[340px] mt-0 md:mt-2 px-2">
             <CardBody>
-              <div className="text-center pb-1 mb-2">
+              <div className="text-center pb-1 mt-0 md:mb-2">
                 <small className="text-sm">Get the app.</small>
               </div>
               <Link href='#'>

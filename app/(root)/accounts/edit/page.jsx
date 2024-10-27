@@ -1,9 +1,37 @@
 'use client';
 
+
+import { useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { Avatar, Input, Button, Select, SelectItem, Textarea } from '@nextui-org/react';
 
-export default function EditPage({ profile }) {
+export default function EditPage() {
+    const searchParams = useSearchParams();
+    const [profileData, setProfileData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const profile = searchParams.get('profile');
+        if (profile) {
+            try {
+                setProfileData(JSON.parse(profile));
+            } catch (error) {
+                console.error('Error parsing profile data:', error);
+            }
+        }
+    }, [searchParams]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setProfileData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    if (!profileData) {
+        return <p>Loading...</p>;
+    }
 
     return (
         <main className='flex'>
