@@ -201,19 +201,16 @@ export default function Reel({ reel }) {
             <div className='absolute bottom-0 left-0 h-auto py-2 w-[calc(100%-56px)] z-40'>
                 <div className='flex flex-col px-2'>
                     <div className='flex gap-3 py-2 w-full'>
-                        <div className={`relative ${hasStory ? 'bg-gradient-to-tr from-[#FFC800] to-[#CC00BF] p-[2px]' : ''} mt-0 bg-default text-default-foreground rounded-full`}>
-                            <a href="#" className="block bg-white dark:bg-black
-                                 p-[2px] rounded-full">
-                                <Avatar
-                                    width={38}
-                                    shadow='sm'
-                                    height={38}
-                                    radius="full"
-                                    className="text-sm"
-                                    alt={reel.user.username}
-                                    src={reel.user.profile_picture}
-                                />
-                            </a>
+                        <div className={`relative ${hasStory ? 'bg-gradient-to-tr from-[#FFC800] to-[#CC00BF] p-[2px] rounded-full' : ''}`}>
+                            <Link href={`/accounts/${reel.user.username}`}>
+                                <div className={`rounded-full ${hasStory ? 'bg-white dark:bg-black p-[2px]' : ''}`}>
+                                    <Avatar
+                                        alt={reel.user.username}
+                                        src={reel.user.profile_picture}
+                                        className="w-10 h-10 text-sm"
+                                    />
+                                </div>
+                            </Link>
                         </div>
                         <div className="flex">
                             <span className="flex">
@@ -224,8 +221,7 @@ export default function Reel({ reel }) {
                                     {(isAdmin || isVerified) && (
                                         <span className='mt-1.5'>
                                             <CheckMark
-                                                className={isAdmin ? 'text-green-500' : 'text-blue-500'}
-                                                fill={isAdmin ? 'green' : 'blue'}
+                                                fill={isAdmin ? 'green' : '#0090EE'}
                                             />
                                         </span>
                                     )}

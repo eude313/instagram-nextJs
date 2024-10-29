@@ -23,22 +23,6 @@ export default function ChatPage() {
   const emojiPickerRef = React.useRef(null);
   const [chatData, setChatData] = React.useState(null);
 
-  // const chatData = React.useMemo(() => {
-  //   if (!chatId) {
-  //     return { users: [] }; 
-  //   }
-  //   const userIds = chatId.split('-');
-  //   return {
-  //     users: userIds.map(id => ({
-  //       id,
-  //       name: `User ${id}`,
-  //       username: `user${id}`,
-  //       src: '/user.png',
-  //       alt: `User ${id}'s avatar`
-  //     }))
-  //   };
-  // }, [chatId]);
-
 
   React.useEffect(() => {
     const fetchChatData = async () => {

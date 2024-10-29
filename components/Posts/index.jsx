@@ -200,70 +200,175 @@ const Posts = ({ post }) => {
     setComment(e.target.value);
   };
 
+  // const renderMedia = () => {
+  //   if (post.media && post.media.length > 0) {
+  //     if (post.media.length === 1) {
+  //       const media = post.media[0];
+  //       return media.media_type === 'image' ? (
+  //         <Image
+  //           alt="Post content"
+  //           src={media.media_file}
+  //           className="w-full h-auto rounded-none md:rounded-md z-0" />
+  //       ) : (
+
+  //         <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
+  //           <video
+  //             loop
+  //             autoPlay
+  //             playsInline
+  //             ref={videoRef}
+  //             muted={isMuted}
+  //             src={media.media_file}
+  //             onClick={handleVideoClick}
+  //             className="absolute top-0 left-0 w-full h-full object-contain" />
+  //           <Button
+  //             isIconOnly
+  //             aria-label="mute/UnMute"
+  //             onClick={handleMuteToggle}
+  //             className="bg-inherit absolute bottom-2 right-2 z-20 text-white"
+  //           >
+  //             {isMuted ? <UnMute /> : <Mute />}
+  //           </Button>
+  //         </div>
+
+  //       );
+  //     } else {
+  //       return (
+  //         <Carousel>
+  //           {post.media.map((media, index) => (
+  //             <Carousel.Item key={index}>
+  //               {media.media_type === 'image' ? (
+  //                 <Image
+  //                   src={media.media_file}
+  //                   className="w-full h-auto rounded-none md:rounded-md"
+  //                   alt={`Post content ${index + 1}`} />
+  //               ) : (
+  //                 <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
+  //                   <video
+  //                     loop
+  //                     autoPlay
+  //                     playsInline
+  //                     ref={videoRef}
+  //                     muted={isMuted}
+  //                     src={media.media_file}
+  //                     onClick={handleVideoClick}
+  //                     className="absolute top-0 left-0 w-full h-full object-contain" />
+  //                   <Button
+  //                     isIconOnly
+  //                     aria-label="mute/unmute"
+  //                     onClick={handleMuteToggle}
+  //                     className="absolute bottom-2 right-2 z-20 bg-black/50 text-white"
+  //                   >
+  //                     {isMuted ? <UnMute /> : <Mute />}
+  //                   </Button>
+  //                 </div>
+
+  //               )}
+  //             </Carousel.Item>
+  //           ))}
+  //         </Carousel>
+  //       );
+  //     }
+  //   }
+  //   return null;
+  // };
+
+  const renderTags = (mediaIndex) => {
+    if (!post.tags) return null;
+
+    return post.tags
+      .filter(tag => tag.media_index === mediaIndex)
+      .map((tag, index) => (
+        <div
+          key={index}
+          className="absolute bg-black/50 text-white px-2 py-1 text-sm rounded pointer-events-none"
+          style={{
+            left: `${tag.position.x}px`,
+            top: `${tag.position.y}px`,
+          }}
+        >
+          {tag.username}
+        </div>
+      ));
+  };
+
   const renderMedia = () => {
     if (post.media && post.media.length > 0) {
       if (post.media.length === 1) {
         const media = post.media[0];
-        return media.media_type === 'image' ? (
-          <Image
-            alt="Post content"
-            src={media.media_file}
-            className="w-full h-auto rounded-none md:rounded-md z-0" />
-        ) : (
-
-          <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
-            <video
-              loop
-              autoPlay
-              playsInline
-              ref={videoRef}
-              muted={isMuted}
-              src={media.media_file}
-              onClick={handleVideoClick}
-              className="absolute top-0 left-0 w-full h-full object-contain" />
-            <Button
-              isIconOnly
-              aria-label="mute/UnMute"
-              onClick={handleMuteToggle}
-              className="bg-inherit absolute bottom-2 right-2 z-20 text-white"
-            >
-              {isMuted ? <Mute /> : <UnMute />}
-            </Button>
+        return (
+          <div className="relative">
+            {media.media_type === 'image' ? (
+              <>
+                <Image
+                  alt="Post content"
+                  src={media.media_file}
+                  className="w-full h-auto rounded-none md:rounded-md z-0"
+                />
+                {renderTags(0)}
+              </>
+            ) : (
+              <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
+                <video
+                  loop
+                  autoPlay
+                  playsInline
+                  ref={videoRef}
+                  muted={isMuted}
+                  src={media.media_file}
+                  onClick={handleVideoClick}
+                  className="absolute top-0 left-0 w-full h-full object-contain"
+                />
+                <Button
+                  isIconOnly
+                  aria-label="mute/UnMute"
+                  onClick={handleMuteToggle}
+                  className="bg-inherit absolute bottom-2 right-2 z-20 text-white"
+                >
+                  {isMuted ? <UnMute /> : <Mute />}
+                </Button>
+              </div>
+            )}
           </div>
-
         );
       } else {
         return (
           <Carousel>
             {post.media.map((media, index) => (
               <Carousel.Item key={index}>
-                {media.media_type === 'image' ? (
-                  <Image
-                    src={media.media_file}
-                    className="w-full h-auto rounded-none md:rounded-md"
-                    alt={`Post content ${index + 1}`} />
-                ) : (
-                  <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
-                    <video
-                      loop
-                      autoPlay
-                      playsInline
-                      ref={videoRef}
-                      muted={isMuted}
-                      src={media.media_file}
-                      onClick={handleVideoClick}
-                      className="absolute top-0 left-0 w-full h-full object-contain" />
-                    <Button
-                      isIconOnly
-                      aria-label="mute/unmute"
-                      onClick={handleMuteToggle}
-                      className="absolute bottom-2 right-2 z-20 bg-black/50 text-white"
-                    >
-                      {isMuted ? <Mute /> : <UnMute />}
-                    </Button>
-                  </div>
-
-                )}
+                <div className="relative">
+                  {media.media_type === 'image' ? (
+                    <>
+                      <Image
+                        src={media.media_file}
+                        className="w-full h-auto rounded-none md:rounded-md"
+                        alt={`Post content ${index + 1}`}
+                      />
+                      {renderTags(index)}
+                    </>
+                  ) : (
+                    <div className="h-[585px] w-full rounded-none md:rounded-md relative overflow-hidden">
+                      <video
+                        loop
+                        autoPlay
+                        playsInline
+                        ref={videoRef}
+                        muted={isMuted}
+                        src={media.media_file}
+                        onClick={handleVideoClick}
+                        className="absolute top-0 left-0 w-full h-full object-contain"
+                      />
+                      <Button
+                        isIconOnly
+                        aria-label="mute/unmute"
+                        onClick={handleMuteToggle}
+                        className="absolute bottom-2 right-2 z-20 bg-black/50 text-white"
+                      >
+                        {isMuted ? <UnMute /> : <Mute />}
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </Carousel.Item>
             ))}
           </Carousel>
@@ -276,7 +381,7 @@ const Posts = ({ post }) => {
   return (
     <div className='mx-auto' ref={postRef}>
       <div className='flex flex-row py-2 gap-3 px-3 top'>
-        <div className={`relative ${hasStory ? 'bg-gradient-to-tr from-[#FFC800] to-[#CC00BF] p-[2px]' : ''} mt-0 bg-default text-default-foreground rounded-full`}>
+        {/* <div className={`relative ${hasStory ? 'bg-gradient-to-tr from-[#FFC800] to-[#CC00BF] p-[2px]' : ''} mt-0 bg-default text-default-foreground rounded-full`}>
           <Link href={`/accounts/${post.user.username}`}>
             <div className={`rounded-full ${hasStory ? 'bg-white dark:bg-black p-[2px]' : ''}`}>
               <Avatar
@@ -287,6 +392,17 @@ const Posts = ({ post }) => {
                 className="text-sm"
                 alt={post.user.username}
                 src={post.user.profile_picture}
+              />
+            </div>
+          </Link>
+        </div> */}
+        <div className={`relative ${hasStory ? 'bg-gradient-to-tr from-[#FFC800] to-[#CC00BF] p-[2px] rounded-full' : ''}`}>
+          <Link href={`/accounts/${post.user.username}`}>
+            <div className={`rounded-full ${hasStory ? 'bg-white dark:bg-black p-[2px]' : ''}`}>
+              <Avatar
+                alt={post.user.username}
+                src={post.user.profile_picture}
+                className="w-10 h-10 text-sm"
               />
             </div>
           </Link>
@@ -301,8 +417,7 @@ const Posts = ({ post }) => {
                 {(isAdmin || isVerified) && (
                   <span className='mt-1.5'>
                     <CheckMark
-                      className={isAdmin ? 'text-green-500' : 'text-blue-500'}
-                      fill={isAdmin ? 'green' : 'blue'}
+                      fill={isAdmin ? 'green' : '#0090EE'}
                     />
                   </span>
                 )}
@@ -349,7 +464,7 @@ const Posts = ({ post }) => {
             </Button>
             <Button isIconOnly aria-label="save" className="ml-auto bg-inherit"
               onPress={() => handleSave(post.id)}>
-              {savedPosts[post.id] ? <Bookmark /> : <Remove />}
+              {savedPosts[post.id] ? <Remove /> : <Bookmark />}
             </Button>
           </div>
           <div className="w-full mb-2">
